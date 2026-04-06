@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+spec:
+  clusterIP: None
+  selector:
+    app: zookeeper
+  ports:
+    - port: 2181
+      name: client
+    - port: 2888
+      name: peer
+    - port: 3888
+      name: leader-election
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  selector:
+    app: zookeeper
+  ports:
+    - port: 2181
+      name: client
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper-headless
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      initContainers:
+        - name: init-myid
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              ORDINAL=$(hostname | rev | cut -d- -f1 | rev)
+              mkdir -p /data
+              echo $((ORDINAL + 1)) > /data/myid
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.9.3
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+          env:
+            - name: ZOO_MY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ZOO_SERVERS
+              value: "server.1=zookeeper-0.zookeeper-headless:2888:3888;2181 server.2=zookeeper-1.zookeeper-headless:2888:3888;2181 server.3=zookeeper-2.zookeeper-headless:2888:3888;2181"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
