@@ -1,0 +1,81 @@
+TEST PURPOSE
+------------
+What: Three simultaneous NetworkChaos objects each isolate one of the 3
+      ZooKeeper nodes from the other two (1+1+1 partition).
+Why:  With ALL nodes isolated, no node has any peers visible. No node can
+      reach the 2/3 majority needed to become or remain leader. The entire
+      ensemble should be in LOOKING/error state simultaneously.
+Academic significance:
+  - Extreme case: total network fragmentation with no possible quorum
+  - Unlike a simple leader partition (B), here EVERY node is isolated
+  - Tests whether ZooKeeper correctly refuses to serve ANY requests when
+    the entire cluster is partitioned (no split-brain possible because no
+    group can form quorum)
+  - With only 1 node visible to itself, majority requires 2/3 - impossible
+  - Expected: all 3 nodes go to not_running/error/looking; writes rejected
+
+EXPERIMENT: threeway_isolation  [NEW - v2 only]
+PARTITION LAYOUT: pod-0 isolated | pod-1 isolated | pod-2 isolated
+                  (1+1+1) - no group has 2/3 majority
+RUN: 3
+START TIME: 2026-04-10 15:41:02.137
+[2026-04-10 15:41:02.141] PREFLIGHT attempt 1/6 at 2026-04-10 15:41:02.141
+[2026-04-10 15:41:02.269]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 15:41:04.516]     zookeeper-0: follower
+[2026-04-10 15:41:04.517]     zookeeper-1: follower
+[2026-04-10 15:41:04.518]     zookeeper-2: leader
+[2026-04-10 15:41:04.519]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 15:41:04.519] PREFLIGHT PASSED [2026-04-10 15:41:04.519]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 15:41:04.523] Generated YAML: chaos_yamls\chaos_v2_3way_nc0_run3_dynamic.yaml | isolates zookeeper-0 from ['zookeeper-1', 'zookeeper-2']
+[2026-04-10 15:41:04.524] Generated YAML: chaos_yamls\chaos_v2_3way_nc1_run3_dynamic.yaml | isolates zookeeper-1 from ['zookeeper-0', 'zookeeper-2']
+[2026-04-10 15:41:04.526] Generated YAML: chaos_yamls\chaos_v2_3way_nc2_run3_dynamic.yaml | isolates zookeeper-2 from ['zookeeper-0', 'zookeeper-1']
+
+--- Applying all 3 NetworkChaos objects simultaneously ---
+[2026-04-10 15:41:04.809] ALL 3 FAULTS INJECTED at 2026-04-10 15:41:04.802: 3-way isolation in effect (1+1+1 partition)
+[2026-04-10 15:41:04.810] --- Polling every 1 s for 75 seconds ---
+[2026-04-10 15:41:08.421] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 15:41:08.422]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 15:41:11.418] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:11.419]   ALL NODES LOST QUORUM at 2026-04-10 15:41:11.419 [6.617s after injection]: no leader or follower visible on any node
+[2026-04-10 15:41:14.446] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:18.007] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:21.315] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:24.521] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:28.296] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:31.200] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:34.731] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:38.333] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:42.400] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:46.399] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:49.603] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:52.494] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:56.698] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:41:59.915] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:04.403] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:08.489] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:12.809] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:18.305] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:23.607] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+
+--- Deleting all 3 NetworkChaos objects simultaneously ---
+[2026-04-10 15:42:25.167] ALL FAULTS REMOVED at 2026-04-10 15:42:25.167
+[2026-04-10 15:42:25.168] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 15:42:27.995] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:31.413] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:34.920] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:39.102] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:44.810] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:50.312] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:42:55.195] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 15:42:55.196] RECOVERY CONFIRMED at 2026-04-10 15:42:55.196: leader=zookeeper-2, recovery_seconds=110.4s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:42:55.197
+LEADER AT END: zookeeper-2
+ALL NODES LOST QUORUM: yes
+RECOVERY SECONDS: 110.4 (from injection)
+NOTES: 3-way isolation (1+1+1): no node had majority; all_nodes_lost_quorum=yes; post-recovery leader: zookeeper-2
+[2026-04-10 15:42:55.202] Run complete - log saved to logs\log_v2_threeway_isolation_run3.txt

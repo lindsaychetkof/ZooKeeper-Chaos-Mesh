@@ -1,0 +1,47 @@
+EXPERIMENT: network_partition
+RUN: 3
+START TIME: 2026-04-09 18:37:06.263
+[2026-04-09 18:37:06.266] PREFLIGHT attempt 1/6 at 2026-04-09 18:37:06.266
+[2026-04-09 18:37:06.456]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:37:09.677]     zookeeper-0: follower
+[2026-04-09 18:37:09.680]     zookeeper-1: leader
+[2026-04-09 18:37:09.681]     zookeeper-2: follower
+[2026-04-09 18:37:09.683]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:37:09.686] PREFLIGHT PASSED [2026-04-09 18:37:09.686]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:37:09.697] Generated YAML: chaos_partition_run3_dynamic.yaml
+[2026-04-09 18:37:09.700]   action=partition, direction=both, source=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+[2026-04-09 18:37:10.102] FAULT INJECTED at 2026-04-09 18:37:10.102: kubectl apply -f chaos_partition_run3_dynamic.yaml
+[2026-04-09 18:37:10.103] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:37:15.521] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:leader
+[2026-04-09 18:37:15.523]   SPLIT-BRAIN WINDOW OBSERVED: isolated leader zookeeper-1 still reports 'leader' while follower side also elected leader: ['zookeeper-2']
+[2026-04-09 18:37:15.524]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 at 2026-04-09 18:37:15.524
+[2026-04-09 18:37:23.000] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:29.919] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:38.115] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:46.352] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:54.221] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:02.041] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:09.756] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:18.008] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:26.037] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:31.201] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:38:31.457] FAULT REMOVED (manual) at 2026-04-09 18:38:31.457
+[2026-04-09 18:38:31.459] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:38:34.727] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:42.500] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:50.596] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:58.930] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:39:06.991] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:39:06.993] RECOVERY CONFIRMED at 2026-04-09 18:39:06.992: leader=zookeeper-2, recovery_seconds=116.9s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:39:06.993
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 116.9
+RECOVERY SECONDS: 116.9
+NOTES: split-brain window observed: isolated leader + followers both reported 'leader'; new leader elected among followers: zookeeper-2
+[2026-04-09 18:39:07.000] Run complete - log saved to log_network_partition_run3.txt

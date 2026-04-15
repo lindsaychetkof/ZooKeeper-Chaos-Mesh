@@ -1,0 +1,38 @@
+EXPERIMENT: kill_leader
+RUN: 1
+START TIME: 2026-04-09 18:17:26.088
+[2026-04-09 18:17:26.089] PREFLIGHT attempt 1/6 at 2026-04-09 18:17:26.089
+[2026-04-09 18:17:26.224]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:17:28.457]     zookeeper-0: follower
+[2026-04-09 18:17:28.458]     zookeeper-1: follower
+[2026-04-09 18:17:28.458]     zookeeper-2: leader
+[2026-04-09 18:17:28.459]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:17:28.459] PREFLIGHT PASSED [2026-04-09 18:17:28.459]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:17:28.460] Generated YAML: chaos_kill_leader_run1_dynamic.yaml (targeting zookeeper-2)
+[2026-04-09 18:17:28.706] FAULT INJECTED at 2026-04-09 18:17:28.706: kubectl apply -f chaos_kill_leader_run1_dynamic.yaml
+[2026-04-09 18:17:28.707] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:17:32.184] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:17:32.185] NEW LEADER ELECTED: zookeeper-1 at 2026-04-09 18:17:32.185
+[2026-04-09 18:17:38.760] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:unknown
+[2026-04-09 18:17:45.392] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:17:52.819] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:18:03.225] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:18:10.439] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:17.934] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:24.985] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:30.238] FAULT REMOVED at 2026-04-09 18:18:30.238: kubectl delete -f chaos_kill_leader_run1_dynamic.yaml
+[2026-04-09 18:18:30.239] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:18:32.789] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:32.789] RECOVERY CONFIRMED at 2026-04-09 18:18:32.789: leader=zookeeper-1, recovery_seconds=64.1s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:18:32.790
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 64.1
+RECOVERY SECONDS: 64.1
+NOTES: new leader elected during fault: zookeeper-1
+[2026-04-09 18:18:32.791] Run complete - log saved to log_kill_leader_run1.txt

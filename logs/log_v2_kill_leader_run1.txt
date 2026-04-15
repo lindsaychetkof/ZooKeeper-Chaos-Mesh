@@ -1,0 +1,61 @@
+TEST PURPOSE
+------------
+What: A ZooKeeper leader pod is forcibly killed via Chaos Mesh PodChaos.
+Why:  This directly tests ZAB (ZooKeeper Atomic Broadcast) leader election.
+      When the leader dies the two remaining followers must detect the loss
+      (via heartbeat timeout) and elect a new leader among themselves.
+      With 3 nodes, 2/3 constitutes majority; so 2 surviving nodes CAN
+      elect a new leader. We measure time-to-election at 1-second resolution.
+Academic significance:
+  - Validates ZAB quorum requirement (>50% majority needed)
+  - Measures leader election latency under pod failure
+  - Tests Kubernetes StatefulSet self-healing alongside ZK session management
+  - Expected: new leader elected within ~2-5 seconds; full recovery ~20-90s
+
+EXPERIMENT: kill_leader  [v2 - 1-second parallel polling]
+RUN: 1
+START TIME: 2026-04-10 15:08:04.532
+[2026-04-10 15:08:04.533] PREFLIGHT attempt 1/6 at 2026-04-10 15:08:04.533
+[2026-04-10 15:08:04.726]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 15:08:09.193]     zookeeper-0: follower
+[2026-04-10 15:08:09.193]     zookeeper-1: follower
+[2026-04-10 15:08:09.194]     zookeeper-2: leader
+[2026-04-10 15:08:09.194]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 15:08:09.194] PREFLIGHT PASSED [2026-04-10 15:08:09.194]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 15:08:09.196] Generated YAML: chaos_yamls\chaos_v2_kill_leader_run1_dynamic.yaml (targeting zookeeper-2)
+[2026-04-10 15:08:09.491] FAULT INJECTED at 2026-04-10 15:08:09.491: kubectl apply -f chaos_yamls\chaos_v2_kill_leader_run1_dynamic.yaml
+[2026-04-10 15:08:09.492] --- Polling every 1 s for 60 seconds (parallel) ---
+[2026-04-10 15:08:13.281] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-10 15:08:13.282] NEW LEADER ELECTED: zookeeper-1 at 2026-04-10 15:08:13.282 [election_latency=3.791s from injection]
+[2026-04-10 15:08:15.974] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-10 15:08:19.573] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:22.970] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:25.989] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:30.383] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:34.998] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:38.389] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:41.296] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:44.092] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:47.373] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:50.389] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:53.792] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:08:58.981] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:09:03.764] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:09:07.285] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:09:10.389] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:09:11.611] FAULT REMOVED at 2026-04-10 15:09:11.611: kubectl delete -f chaos_yamls\chaos_v2_kill_leader_run1_dynamic.yaml
+[2026-04-10 15:09:11.612] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 15:09:13.674] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:09:13.675] RECOVERY CONFIRMED at 2026-04-10 15:09:13.675: leader=zookeeper-1, recovery_seconds=64.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:09:13.676
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 3.791
+RECOVERY SECONDS: 64.2
+NOTES: new leader elected during fault: zookeeper-1 (election_latency=3.791s)
+[2026-04-10 15:09:13.680] Run complete - log saved to logs\log_v2_kill_leader_run1.txt

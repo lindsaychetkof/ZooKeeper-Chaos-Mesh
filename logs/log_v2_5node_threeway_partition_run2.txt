@@ -1,0 +1,75 @@
+TEST PURPOSE
+------------
+What: A 5-node ZooKeeper ensemble is split into THREE groups using two
+      simultaneous NetworkChaos objects:
+      Group A: {zk5-0, zk5-1}     (2 nodes - 2/5, minority)
+      Group B: {zk5-2, zk5-3}     (2 nodes - 2/5, minority)
+      Group C: {zk5-4}             (1 node  - 1/5, minority)
+      NC1 partitions {zk5-0,1} from {zk5-2,3,4}
+      NC2 partitions {zk5-2,3} from {zk5-0,1,4}
+      Result: all three groups are mutually isolated with no group >= 3/5.
+Why:  Three-way partition ensures NO group has 3/5 majority. ZooKeeper
+      requires strictly more than half the total ensemble (not just visible
+      peers) to form quorum. With total ensemble = 5, quorum threshold = 3.
+      No group reaches 3, so the entire cluster loses write availability.
+Academic significance:
+  - Maximum fragmentation test: even the largest group (2 nodes) cannot
+    form quorum without reaching 3/5
+  - Contrasts with Experiment E where one group retained majority
+  - Tests ZooKeeper's global quorum requirement (not just local majority
+    among visible peers)
+  - All 5 nodes expected to go to LOOKING/not_running within ~30 seconds
+  - After healing: tests how 5 nodes re-form quorum when partitions lift
+
+EXPERIMENT: 5node_threeway_partition  [NEW - v2 only, 5-node ensemble]
+NC1: {zk5-0, zk5-1} isolated from {zk5-2, zk5-3, zk5-4}
+NC2: {zk5-2, zk5-3} isolated from {zk5-0, zk5-1, zk5-4}
+Result: Group A={zk5-0,1}(2/5) | Group B={zk5-2,3}(2/5) | Group C={zk5-4}(1/5)
+        No group reaches 3/5 quorum threshold
+RUN: 2
+START TIME: 2026-04-10 15:58:06.735
+[2026-04-10 15:58:06.742] PREFLIGHT-5NODE attempt 1/6 at 2026-04-10 15:58:06.742
+[2026-04-10 15:58:06.890]   Check 1 PASS: all 5 zookeeper5 pods are 1/1 Running
+[2026-04-10 15:58:14.343]     zookeeper5-0: follower
+[2026-04-10 15:58:14.344]     zookeeper5-1: follower
+[2026-04-10 15:58:14.345]     zookeeper5-2: follower
+[2026-04-10 15:58:14.346]     zookeeper5-3: follower
+[2026-04-10 15:58:14.346]     zookeeper5-4: leader
+[2026-04-10 15:58:14.347]   Check 2 PASS: leader=zookeeper5-4, followers=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2', 'zookeeper5-3']
+[2026-04-10 15:58:14.348] PREFLIGHT-5NODE PASSED [2026-04-10 15:58:14.348]
+LEADER AT START: zookeeper5-4
+FOLLOWERS: ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2', 'zookeeper5-3']
+
+[2026-04-10 15:58:14.352] Generated YAML: chaos_yamls\chaos_v2_5node_3way_nc1_run2_dynamic.yaml
+[2026-04-10 15:58:14.352]   NC1: isolates ['zookeeper5-0', 'zookeeper5-1'] from ['zookeeper5-2', 'zookeeper5-3', 'zookeeper5-4']
+[2026-04-10 15:58:14.353] Generated YAML: chaos_yamls\chaos_v2_5node_3way_nc2_run2_dynamic.yaml
+[2026-04-10 15:58:14.354]   NC2: isolates ['zookeeper5-2', 'zookeeper5-3'] from ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-4']
+[2026-04-10 15:58:14.354] Combined effect: Group A=['zookeeper5-0', 'zookeeper5-1'] | Group B=['zookeeper5-2', 'zookeeper5-3'] | Group C=['zookeeper5-4']
+
+--- Applying both NetworkChaos objects simultaneously ---
+[2026-04-10 15:58:14.644] BOTH FAULTS INJECTED at 2026-04-10 15:58:14.638: 3-way partition active (2+2+1, no group has 3/5 majority)
+[2026-04-10 15:58:14.645] --- Polling every 1s for 75 seconds ---
+[2026-04-10 15:58:22.684] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:58:22.698]   ALL 5 NODES LOST QUORUM at 2026-04-10 15:58:22.698 [8.06s after injection]: 2+2+1 partition confirmed - entire cluster unavailable
+[2026-04-10 15:58:31.763] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:58:40.827] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:58:49.912] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:58:58.960] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:59:07.717] POLL: zookeeper5-0:not_running | zookeeper5-1:not_running | zookeeper5-2:not_running | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:59:16.217] POLL: zookeeper5-0:not_running | zookeeper5-1:not_running | zookeeper5-2:not_running | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:59:25.270] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:not_running | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 15:59:33.124] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:follower | zookeeper5-3:follower | zookeeper5-4:leader
+[2026-04-10 15:59:33.124]   NOTE: ['zookeeper5-4'] still claims 'leader' - may not have detected partition yet (ZK session timeout ~30s)
+
+--- Deleting both NetworkChaos objects simultaneously ---
+[2026-04-10 15:59:34.700] ALL FAULTS REMOVED at 2026-04-10 15:59:34.700
+[2026-04-10 15:59:34.701] --- Polling for full recovery (all 5 pods Running, exactly 1 leader) ---
+[2026-04-10 15:59:41.738] RECOVERY POLL: pods_running=True(5/5) | zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:follower | zookeeper5-3:follower | zookeeper5-4:leader
+[2026-04-10 15:59:41.739] RECOVERY CONFIRMED at 2026-04-10 15:59:41.739: leader=zookeeper5-4, recovery_seconds=87.1s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:59:41.740
+LEADER AT END: zookeeper5-4
+ALL NODES LOST QUORUM: True
+RECOVERY SECONDS: 87.1
+NOTES: 2+2+1 three-way partition: no group had 3/5 majority; all_nodes_lost_quorum=True; spurious_leader_claims_observed=True; post-recovery leader: zookeeper5-4
+[2026-04-10 15:59:41.745] Run complete - log saved to logs\log_v2_5node_threeway_partition_run2.txt

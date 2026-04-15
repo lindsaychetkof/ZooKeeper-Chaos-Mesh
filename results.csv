@@ -1,0 +1,4 @@
+experiment_name,description,chaos_apply_time,first_error_time,recovery_time,time_to_first_error_s,recovery_duration_s,total_outage_s,pre_zk0_status,pre_zk1_status,pre_zk2_status,post_zk0_status,post_zk1_status,post_zk2_status,notes
+kill_follower,Kill zookeeper-0 (follower),18:11:20.957,N/A,N/A,N/A,N/A,N/A,follower,leader,follower,follower,leader,follower,no error detected
+kill_leader,Kill zookeeper-1 (leader),18:13:56.700,18:13:57.203,18:14:50.503,0.503,53.3,53.803,follower,leader,follower,follower,follower,leader,
+network_partition,Network partition isolating zookeeper-1 (leader),18:15:24.524,N/A,N/A,N/A,N/A,N/A,follower,follower,leader,follower,follower,leader,no error detected

@@ -1,0 +1,102 @@
+---
+# 5-node ZooKeeper ensemble for split-majority partition experiments.
+# This is a SEPARATE StatefulSet from the existing 3-node cluster so both
+# can coexist in the same namespace without interference.
+#
+# WHY 5 NODES:
+#   With 3 nodes you cannot create two groups that both have majority
+#   (majority = strict >50%, i.e. 2/3 = minority, 1/3 = minority).
+#   With 5 nodes:
+#     - 3+2 partition: the 3-node group has 3/5 majority, can elect a leader.
+#                      The 2-node group has only 2/5, cannot form quorum.
+#     - 2+2+1 partition: no group has 3/5 majority; all lose quorum.
+#   These scenarios directly test ZooKeeper's quorum guarantee.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper5-headless
+  namespace: default
+  labels:
+    app: zookeeper5
+spec:
+  clusterIP: None
+  selector:
+    app: zookeeper5
+  ports:
+    - port: 2181
+      name: client
+    - port: 2888
+      name: peer
+    - port: 3888
+      name: leader-election
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper5
+  namespace: default
+  labels:
+    app: zookeeper5
+spec:
+  selector:
+    app: zookeeper5
+  ports:
+    - port: 2181
+      name: client
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper5
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper5
+  serviceName: zookeeper5-headless
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: zookeeper5
+    spec:
+      initContainers:
+        - name: init-myid
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              ORDINAL=$(hostname | rev | cut -d- -f1 | rev)
+              mkdir -p /data
+              echo $((ORDINAL + 1)) > /data/myid
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.9.3
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+          env:
+            - name: ZOO_SERVERS
+              value: >-
+                server.1=zookeeper5-0.zookeeper5-headless:2888:3888;2181
+                server.2=zookeeper5-1.zookeeper5-headless:2888:3888;2181
+                server.3=zookeeper5-2.zookeeper5-headless:2888:3888;2181
+                server.4=zookeeper5-3.zookeeper5-headless:2888:3888;2181
+                server.5=zookeeper5-4.zookeeper5-headless:2888:3888;2181
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

@@ -1,0 +1,64 @@
+TEST PURPOSE
+------------
+What: A 5-node ZooKeeper ensemble is partitioned into two groups:
+      Group A: {zk5-0, zk5-1, zk5-2} (3 nodes - has 3/5 = 60% majority)
+      Group B: {zk5-3, zk5-4}         (2 nodes - has 2/5 = 40% minority)
+Why:  With 5 nodes, it IS possible to create two groups where one group
+      has strict majority and the other does not. This is impossible with
+      3 nodes (you cannot split 3 into two groups both having >50%).
+Academic significance:
+  - Tests asymmetric partition: one side maintains service, other loses it
+  - Group A (3 nodes) should elect/retain a leader and continue operating
+  - Group B (2 nodes) cannot reach quorum and must refuse writes/reads
+  - This is the "correct" split-brain resolution: ZooKeeper correctly
+    identifies which side has majority and only that side serves clients
+  - Real-world relevance: datacenter partition where main DC has majority
+
+EXPERIMENT: 5node_majority_partition  [NEW - v2 only, 5-node ensemble]
+PARTITION: {zk5-0, zk5-1, zk5-2} vs {zk5-3, zk5-4}
+           Group A (3/5 = majority) | Group B (2/5 = minority)
+RUN: 1
+START TIME: 2026-04-10 15:44:55.765
+[2026-04-10 15:44:55.770] PREFLIGHT-5NODE attempt 1/6 at 2026-04-10 15:44:55.770
+[2026-04-10 15:44:55.913]   Check 1 PASS: all 5 zookeeper5 pods are 1/1 Running
+[2026-04-10 15:45:02.584]     zookeeper5-0: follower
+[2026-04-10 15:45:02.585]     zookeeper5-1: follower
+[2026-04-10 15:45:02.586]     zookeeper5-2: leader
+[2026-04-10 15:45:02.587]     zookeeper5-3: follower
+[2026-04-10 15:45:02.587]     zookeeper5-4: follower
+[2026-04-10 15:45:02.588]   Check 2 PASS: leader=zookeeper5-2, followers=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+[2026-04-10 15:45:02.588] PREFLIGHT-5NODE PASSED [2026-04-10 15:45:02.588]
+LEADER AT START: zookeeper5-2
+FOLLOWERS: ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+
+[2026-04-10 15:45:02.590] Leader zookeeper5-2 is in Group A. Group A has 3/5 majority so will retain/elect leader.
+[2026-04-10 15:45:02.591] Generated YAML: chaos_yamls\chaos_v2_5node_majority_run1_dynamic.yaml
+[2026-04-10 15:45:02.592]   Partitioning Group A=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2'] from Group B=['zookeeper5-3', 'zookeeper5-4']
+[2026-04-10 15:45:02.836] FAULT INJECTED at 2026-04-10 15:45:02.836: kubectl apply -f chaos_yamls\chaos_v2_5node_majority_run1_dynamic.yaml
+[2026-04-10 15:45:02.837] --- Polling every 1s for 75 seconds ---
+[2026-04-10 15:45:10.376] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 15:45:10.377]   GROUP A LEADER ACTIVE: zookeeper5-2 [7.541s after injection] - 3-node majority intact
+[2026-04-10 15:45:17.379] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:45:17.380]   GROUP B LOST QUORUM at 2026-04-10 15:45:17.380 [14.543s]: both minority nodes are not_running/error
+[2026-04-10 15:45:23.676] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:45:31.796] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:45:39.882] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:45:48.687] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:45:56.478] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:46:01.392] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 15:46:08.691] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:follower
+[2026-04-10 15:46:14.400] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 15:46:21.190] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 15:46:22.319] Chaos object still present after 75s - deleting manually ...
+[2026-04-10 15:46:22.540] FAULT REMOVED (manual) at 2026-04-10 15:46:22.540
+[2026-04-10 15:46:22.541] --- Polling for full recovery (all 5 pods Running, exactly 1 leader) ---
+[2026-04-10 15:46:27.084] RECOVERY POLL: pods_running=True(5/5) | zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 15:46:27.085] RECOVERY CONFIRMED at 2026-04-10 15:46:27.085: leader=zookeeper5-2, recovery_seconds=84.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:46:27.086
+LEADER AT END: zookeeper5-2
+GROUP A (3/5 MAJORITY) PRESERVED QUORUM: True
+GROUP B (2/5 MINORITY) LOST QUORUM: True
+RECOVERY SECONDS: 84.2
+NOTES: Group A (3/5 majority) preserved_quorum=True; Group B (2/5 minority) lost_quorum=True; group_a_leader_during_partition=zookeeper5-2; post-recovery leader: zookeeper5-2
+[2026-04-10 15:46:27.090] Run complete - log saved to logs\log_v2_5node_majority_partition_run1.txt

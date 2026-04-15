@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: kill-leader-r3
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one
+  gracePeriod: 0
+  selector:
+    namespaces:
+      - default
+    expressionSelectors:
+      - key: statefulset.kubernetes.io/pod-name
+        operator: In
+        values:
+          - zookeeper-2

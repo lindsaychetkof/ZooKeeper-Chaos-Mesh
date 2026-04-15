@@ -1,0 +1,65 @@
+TEST PURPOSE
+------------
+What: A NetworkChaos partition isolates the ZooKeeper leader from both followers.
+      The leader can no longer communicate with any other ensemble member.
+Why:  This creates a classic split-brain scenario. The isolated leader has
+      only 1/3 votes (minority). The two followers have 2/3 (majority) and
+      MUST elect a new leader among themselves. The original leader should
+      step down to LOOKING state once it cannot reach a quorum.
+Academic significance:
+  - Tests ZAB's protection against split-brain (two simultaneous leaders)
+  - Measures whether Chaos Mesh duration field auto-expires chaos objects
+  - Captures the window where both sides may briefly report "leader"
+  - Expected: new leader elected on follower side within ~5-15 seconds
+
+EXPERIMENT: network_partition  [v2 - 1-second parallel polling]
+RUN: 2
+START TIME: 2026-04-10 15:19:25.395
+[2026-04-10 15:19:25.398] PREFLIGHT attempt 1/6 at 2026-04-10 15:19:25.398
+[2026-04-10 15:19:25.598]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 15:19:29.444]     zookeeper-0: follower
+[2026-04-10 15:19:29.445]     zookeeper-1: follower
+[2026-04-10 15:19:29.446]     zookeeper-2: leader
+[2026-04-10 15:19:29.447]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 15:19:29.448] PREFLIGHT PASSED [2026-04-10 15:19:29.448]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 15:19:29.452] Generated YAML: chaos_yamls\chaos_v2_partition_run2_dynamic.yaml
+[2026-04-10 15:19:29.452]   action=partition, direction=both, isolated=zookeeper-2, target=['zookeeper-0', 'zookeeper-1'], duration=60s
+[2026-04-10 15:19:29.799] FAULT INJECTED at 2026-04-10 15:19:29.798: kubectl apply -f chaos_yamls\chaos_v2_partition_run2_dynamic.yaml
+[2026-04-10 15:19:29.800] --- Polling every 1 s for 75 seconds (duration=60s + 15s buffer, parallel) ---
+[2026-04-10 15:19:36.637] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 15:19:39.838] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:39.839]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-1 [election_latency=10.04s]
+[2026-04-10 15:19:42.648] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:45.548] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:48.229] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:51.040] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:54.631] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:57.343] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:19:59.827] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:02.719] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:07.237] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:12.432] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:17.338] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:21.535] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:26.336] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:32.633] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 15:20:36.054] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:20:40.041] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:20:44.538] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:20:45.684] Chaos object still present after 75s - deleting manually ...
+[2026-04-10 15:20:45.926] FAULT REMOVED (manual) at 2026-04-10 15:20:45.926
+[2026-04-10 15:20:45.927] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 15:20:50.033] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:20:50.034] RECOVERY CONFIRMED at 2026-04-10 15:20:50.034: leader=zookeeper-1, recovery_seconds=80.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:20:50.035
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 10.04
+RECOVERY SECONDS: 80.2
+NOTES: new leader among followers: zookeeper-1 (election_latency=10.04s)
+[2026-04-10 15:20:50.039] Run complete - log saved to logs\log_v2_network_partition_run2.txt

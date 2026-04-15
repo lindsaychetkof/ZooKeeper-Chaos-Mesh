@@ -1,0 +1,753 @@
+ZooKeeper Chaos Engineering - Master Log
+Suite started: 2026-04-09 18:17:26.087
+======================================================================
+
+EXPERIMENT: kill_leader
+RUN: 1
+START TIME: 2026-04-09 18:17:26.088
+[2026-04-09 18:17:26.089] PREFLIGHT attempt 1/6 at 2026-04-09 18:17:26.089
+[2026-04-09 18:17:26.224]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:17:28.457]     zookeeper-0: follower
+[2026-04-09 18:17:28.458]     zookeeper-1: follower
+[2026-04-09 18:17:28.458]     zookeeper-2: leader
+[2026-04-09 18:17:28.459]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:17:28.459] PREFLIGHT PASSED [2026-04-09 18:17:28.459]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:17:28.460] Generated YAML: chaos_kill_leader_run1_dynamic.yaml (targeting zookeeper-2)
+[2026-04-09 18:17:28.706] FAULT INJECTED at 2026-04-09 18:17:28.706: kubectl apply -f chaos_kill_leader_run1_dynamic.yaml
+[2026-04-09 18:17:28.707] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:17:32.184] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:17:32.185] NEW LEADER ELECTED: zookeeper-1 at 2026-04-09 18:17:32.185
+[2026-04-09 18:17:38.760] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:unknown
+[2026-04-09 18:17:45.392] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:17:52.819] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:18:03.225] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:18:10.439] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:17.934] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:24.985] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:30.238] FAULT REMOVED at 2026-04-09 18:18:30.238: kubectl delete -f chaos_kill_leader_run1_dynamic.yaml
+[2026-04-09 18:18:30.239] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:18:32.789] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:18:32.789] RECOVERY CONFIRMED at 2026-04-09 18:18:32.789: leader=zookeeper-1, recovery_seconds=64.1s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:18:32.790
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 64.1
+RECOVERY SECONDS: 64.1
+NOTES: new leader elected during fault: zookeeper-1
+[2026-04-09 18:18:32.791] Run complete - log saved to log_kill_leader_run1.txt
+EXPERIMENT: kill_leader
+RUN: 2
+START TIME: 2026-04-09 18:20:02.773
+[2026-04-09 18:20:02.775] PREFLIGHT attempt 1/6 at 2026-04-09 18:20:02.775
+[2026-04-09 18:20:02.923]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:20:05.004]     zookeeper-0: follower
+[2026-04-09 18:20:05.004]     zookeeper-1: leader
+[2026-04-09 18:20:05.005]     zookeeper-2: follower
+[2026-04-09 18:20:05.005]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:20:05.006] PREFLIGHT PASSED [2026-04-09 18:20:05.006]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:20:05.008] Generated YAML: chaos_kill_leader_run2_dynamic.yaml (targeting zookeeper-1)
+[2026-04-09 18:20:05.267] FAULT INJECTED at 2026-04-09 18:20:05.267: kubectl apply -f chaos_kill_leader_run2_dynamic.yaml
+[2026-04-09 18:20:05.270] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:20:10.002] POLL: zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:20:10.003] NEW LEADER ELECTED: zookeeper-2 at 2026-04-09 18:20:10.003
+[2026-04-09 18:20:16.778] POLL: zookeeper-0:follower | zookeeper-1:unknown | zookeeper-2:leader
+[2026-04-09 18:20:23.797] POLL: zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:20:29.988] POLL: zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:20:36.698] POLL: zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:20:43.795] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:20:51.056] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:20:57.944] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:21:05.199] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:21:10.469] FAULT REMOVED at 2026-04-09 18:21:10.469: kubectl delete -f chaos_kill_leader_run2_dynamic.yaml
+[2026-04-09 18:21:10.470] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:21:13.056] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:21:13.057] RECOVERY CONFIRMED at 2026-04-09 18:21:13.057: leader=zookeeper-2, recovery_seconds=67.8s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:21:13.057
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 67.8
+RECOVERY SECONDS: 67.8
+NOTES: new leader elected during fault: zookeeper-2
+[2026-04-09 18:21:13.063] Run complete - log saved to log_kill_leader_run2.txt
+EXPERIMENT: kill_leader
+RUN: 3
+START TIME: 2026-04-09 18:22:43.045
+[2026-04-09 18:22:43.047] PREFLIGHT attempt 1/6 at 2026-04-09 18:22:43.047
+[2026-04-09 18:22:43.193]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:22:45.367]     zookeeper-0: follower
+[2026-04-09 18:22:45.367]     zookeeper-1: follower
+[2026-04-09 18:22:45.368]     zookeeper-2: leader
+[2026-04-09 18:22:45.368]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:22:45.368] PREFLIGHT PASSED [2026-04-09 18:22:45.368]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:22:45.371] Generated YAML: chaos_kill_leader_run3_dynamic.yaml (targeting zookeeper-2)
+[2026-04-09 18:22:45.618] FAULT INJECTED at 2026-04-09 18:22:45.618: kubectl apply -f chaos_kill_leader_run3_dynamic.yaml
+[2026-04-09 18:22:45.619] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:22:49.383] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:22:49.383] NEW LEADER ELECTED: zookeeper-1 at 2026-04-09 18:22:49.383
+[2026-04-09 18:22:55.848] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:23:02.696] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:23:09.535] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:23:19.463] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:23:26.643] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:23:34.383] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:23:40.861] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:23:46.125] FAULT REMOVED at 2026-04-09 18:23:46.125: kubectl delete -f chaos_kill_leader_run3_dynamic.yaml
+[2026-04-09 18:23:46.125] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:23:48.160] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:23:48.161] RECOVERY CONFIRMED at 2026-04-09 18:23:48.161: leader=zookeeper-1, recovery_seconds=62.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:23:48.161
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 62.5
+RECOVERY SECONDS: 62.5
+NOTES: new leader elected during fault: zookeeper-1
+[2026-04-09 18:23:48.163] Run complete - log saved to log_kill_leader_run3.txt
+EXPERIMENT: kill_leader
+RUN: 4
+START TIME: 2026-04-09 18:25:18.145
+[2026-04-09 18:25:18.156] PREFLIGHT attempt 1/6 at 2026-04-09 18:25:18.156
+[2026-04-09 18:25:18.359]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:25:21.352]     zookeeper-0: follower
+[2026-04-09 18:25:21.353]     zookeeper-1: leader
+[2026-04-09 18:25:21.355]     zookeeper-2: follower
+[2026-04-09 18:25:21.356]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:25:21.358] PREFLIGHT PASSED [2026-04-09 18:25:21.358]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:25:21.368] Generated YAML: chaos_kill_leader_run4_dynamic.yaml (targeting zookeeper-1)
+[2026-04-09 18:25:21.654] FAULT INJECTED at 2026-04-09 18:25:21.654: kubectl apply -f chaos_kill_leader_run4_dynamic.yaml
+[2026-04-09 18:25:21.656] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:25:24.635] POLL: zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:25:24.636] NEW LEADER ELECTED: zookeeper-2 at 2026-04-09 18:25:24.636
+[2026-04-09 18:25:33.199] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:25:40.612] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:25:47.436] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:25:53.936] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:00.623] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:07.341] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:14.639] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:21.928] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:27.158] FAULT REMOVED at 2026-04-09 18:26:27.158: kubectl delete -f chaos_kill_leader_run4_dynamic.yaml
+[2026-04-09 18:26:27.159] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:26:28.926] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:26:28.927] RECOVERY CONFIRMED at 2026-04-09 18:26:28.927: leader=zookeeper-2, recovery_seconds=67.3s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:26:28.928
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 67.3
+RECOVERY SECONDS: 67.3
+NOTES: new leader elected during fault: zookeeper-2
+[2026-04-09 18:26:28.932] Run complete - log saved to log_kill_leader_run4.txt
+EXPERIMENT: kill_leader
+RUN: 5
+START TIME: 2026-04-09 18:27:58.915
+[2026-04-09 18:27:58.916] PREFLIGHT attempt 1/6 at 2026-04-09 18:27:58.916
+[2026-04-09 18:27:59.062]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:28:01.385]     zookeeper-0: follower
+[2026-04-09 18:28:01.386]     zookeeper-1: follower
+[2026-04-09 18:28:01.387]     zookeeper-2: leader
+[2026-04-09 18:28:01.388]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:28:01.389] PREFLIGHT PASSED [2026-04-09 18:28:01.389]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:28:01.394] Generated YAML: chaos_kill_leader_run5_dynamic.yaml (targeting zookeeper-2)
+[2026-04-09 18:28:01.646] FAULT INJECTED at 2026-04-09 18:28:01.646: kubectl apply -f chaos_kill_leader_run5_dynamic.yaml
+[2026-04-09 18:28:01.647] --- Polling every 5 s for 60 seconds ---
+[2026-04-09 18:28:05.031] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-09 18:28:05.032] NEW LEADER ELECTED: zookeeper-1 at 2026-04-09 18:28:05.031
+[2026-04-09 18:28:14.475] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:28:22.062] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:28:30.003] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:28:37.611] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:28:45.684] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:28:53.567] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:29:01.321] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:29:06.599] FAULT REMOVED at 2026-04-09 18:29:06.599: kubectl delete -f chaos_kill_leader_run5_dynamic.yaml
+[2026-04-09 18:29:06.599] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:29:09.375] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:29:09.376] RECOVERY CONFIRMED at 2026-04-09 18:29:09.376: leader=zookeeper-1, recovery_seconds=67.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:29:09.377
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 67.7
+RECOVERY SECONDS: 67.7
+NOTES: new leader elected during fault: zookeeper-1
+[2026-04-09 18:29:09.382] Run complete - log saved to log_kill_leader_run5.txt
+EXPERIMENT: network_partition
+RUN: 1
+START TIME: 2026-04-09 18:30:39.370
+[2026-04-09 18:30:39.373] PREFLIGHT attempt 1/6 at 2026-04-09 18:30:39.372
+[2026-04-09 18:30:39.528]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:30:42.198]     zookeeper-0: follower
+[2026-04-09 18:30:42.199]     zookeeper-1: leader
+[2026-04-09 18:30:42.200]     zookeeper-2: follower
+[2026-04-09 18:30:42.200]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:30:42.201] PREFLIGHT PASSED [2026-04-09 18:30:42.201]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:30:42.205] Generated YAML: chaos_partition_run1_dynamic.yaml
+[2026-04-09 18:30:42.206]   action=partition, direction=both, source=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+[2026-04-09 18:30:42.496] FAULT INJECTED at 2026-04-09 18:30:42.496: kubectl apply -f chaos_partition_run1_dynamic.yaml
+[2026-04-09 18:30:42.497] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:30:47.470] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:30:55.409] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:30:55.410]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 at 2026-04-09 18:30:55.410
+[2026-04-09 18:31:03.868] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:11.692] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:19.254] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:26.998] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:34.746] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:44.356] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:31:52.347] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:32:00.056] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:32:05.236] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:32:05.472] FAULT REMOVED (manual) at 2026-04-09 18:32:05.472
+[2026-04-09 18:32:05.473] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:32:08.197] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:32:08.198] RECOVERY CONFIRMED at 2026-04-09 18:32:08.198: leader=zookeeper-2, recovery_seconds=85.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:32:08.199
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 85.7
+RECOVERY SECONDS: 85.7
+NOTES: new leader elected among followers: zookeeper-2
+[2026-04-09 18:32:08.203] Run complete - log saved to log_network_partition_run1.txt
+EXPERIMENT: network_partition
+RUN: 2
+START TIME: 2026-04-09 18:33:38.192
+[2026-04-09 18:33:38.194] PREFLIGHT attempt 1/6 at 2026-04-09 18:33:38.194
+[2026-04-09 18:33:38.366]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:33:41.048]     zookeeper-0: follower
+[2026-04-09 18:33:41.048]     zookeeper-1: follower
+[2026-04-09 18:33:41.049]     zookeeper-2: leader
+[2026-04-09 18:33:41.050]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:33:41.050] PREFLIGHT PASSED [2026-04-09 18:33:41.050]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:33:41.053] Generated YAML: chaos_partition_run2_dynamic.yaml
+[2026-04-09 18:33:41.054]   action=partition, direction=both, source=zookeeper-2, target=['zookeeper-0', 'zookeeper-1'], duration=60s
+[2026-04-09 18:33:41.380] FAULT INJECTED at 2026-04-09 18:33:41.379: kubectl apply -f chaos_partition_run2_dynamic.yaml
+[2026-04-09 18:33:41.381] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:33:45.856] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:33:53.581] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:33:53.581]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-1 at 2026-04-09 18:33:53.581
+[2026-04-09 18:34:01.367] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:09.257] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:17.082] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:24.772] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:32.554] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:40.126] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:47.734] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:34:55.879] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:35:01.055] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:35:01.312] FAULT REMOVED (manual) at 2026-04-09 18:35:01.312
+[2026-04-09 18:35:01.313] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:35:04.076] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:35:12.164] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:35:20.271] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:35:28.338] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:35:36.268] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:35:36.269] RECOVERY CONFIRMED at 2026-04-09 18:35:36.269: leader=zookeeper-1, recovery_seconds=114.9s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:35:36.270
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 114.9
+RECOVERY SECONDS: 114.9
+NOTES: new leader elected among followers: zookeeper-1
+[2026-04-09 18:35:36.275] Run complete - log saved to log_network_partition_run2.txt
+EXPERIMENT: network_partition
+RUN: 3
+START TIME: 2026-04-09 18:37:06.263
+[2026-04-09 18:37:06.266] PREFLIGHT attempt 1/6 at 2026-04-09 18:37:06.266
+[2026-04-09 18:37:06.456]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:37:09.677]     zookeeper-0: follower
+[2026-04-09 18:37:09.680]     zookeeper-1: leader
+[2026-04-09 18:37:09.681]     zookeeper-2: follower
+[2026-04-09 18:37:09.683]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:37:09.686] PREFLIGHT PASSED [2026-04-09 18:37:09.686]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:37:09.697] Generated YAML: chaos_partition_run3_dynamic.yaml
+[2026-04-09 18:37:09.700]   action=partition, direction=both, source=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+[2026-04-09 18:37:10.102] FAULT INJECTED at 2026-04-09 18:37:10.102: kubectl apply -f chaos_partition_run3_dynamic.yaml
+[2026-04-09 18:37:10.103] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:37:15.521] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:leader
+[2026-04-09 18:37:15.523]   SPLIT-BRAIN WINDOW OBSERVED: isolated leader zookeeper-1 still reports 'leader' while follower side also elected leader: ['zookeeper-2']
+[2026-04-09 18:37:15.524]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 at 2026-04-09 18:37:15.524
+[2026-04-09 18:37:23.000] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:29.919] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:38.115] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:46.352] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:37:54.221] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:02.041] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:09.756] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:18.008] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:26.037] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:31.201] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:38:31.457] FAULT REMOVED (manual) at 2026-04-09 18:38:31.457
+[2026-04-09 18:38:31.459] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:38:34.727] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:42.500] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:50.596] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:38:58.930] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:39:06.991] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:39:06.993] RECOVERY CONFIRMED at 2026-04-09 18:39:06.992: leader=zookeeper-2, recovery_seconds=116.9s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:39:06.993
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 116.9
+RECOVERY SECONDS: 116.9
+NOTES: split-brain window observed: isolated leader + followers both reported 'leader'; new leader elected among followers: zookeeper-2
+[2026-04-09 18:39:07.000] Run complete - log saved to log_network_partition_run3.txt
+EXPERIMENT: network_partition
+RUN: 4
+START TIME: 2026-04-09 18:40:36.988
+[2026-04-09 18:40:36.993] PREFLIGHT attempt 1/6 at 2026-04-09 18:40:36.993
+[2026-04-09 18:40:37.240]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:40:39.849]     zookeeper-0: follower
+[2026-04-09 18:40:39.851]     zookeeper-1: follower
+[2026-04-09 18:40:39.852]     zookeeper-2: leader
+[2026-04-09 18:40:39.854]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:40:39.856] PREFLIGHT PASSED [2026-04-09 18:40:39.856]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:40:39.866] Generated YAML: chaos_partition_run4_dynamic.yaml
+[2026-04-09 18:40:39.870]   action=partition, direction=both, source=zookeeper-2, target=['zookeeper-0', 'zookeeper-1'], duration=60s
+[2026-04-09 18:40:40.173] FAULT INJECTED at 2026-04-09 18:40:40.172: kubectl apply -f chaos_partition_run4_dynamic.yaml
+[2026-04-09 18:40:40.174] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:40:44.711] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:40:52.902] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:40:52.903]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-1 at 2026-04-09 18:40:52.903
+[2026-04-09 18:41:01.330] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:09.476] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:17.304] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:24.904] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:32.782] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:41.849] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:49.781] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:41:57.719] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:42:02.922] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:42:03.213] FAULT REMOVED (manual) at 2026-04-09 18:42:03.213
+[2026-04-09 18:42:03.214] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:42:06.415] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:42:13.792] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:42:21.695] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:42:29.719] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:42:29.719] RECOVERY CONFIRMED at 2026-04-09 18:42:29.719: leader=zookeeper-1, recovery_seconds=109.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:42:29.720
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 109.5
+RECOVERY SECONDS: 109.5
+NOTES: new leader elected among followers: zookeeper-1
+[2026-04-09 18:42:29.722] Run complete - log saved to log_network_partition_run4.txt
+EXPERIMENT: network_partition
+RUN: 5
+START TIME: 2026-04-09 18:43:59.709
+[2026-04-09 18:43:59.713] PREFLIGHT attempt 1/6 at 2026-04-09 18:43:59.713
+[2026-04-09 18:43:59.910]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:44:02.894]     zookeeper-0: follower
+[2026-04-09 18:44:02.896]     zookeeper-1: leader
+[2026-04-09 18:44:02.899]     zookeeper-2: follower
+[2026-04-09 18:44:02.901]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:44:02.902] PREFLIGHT PASSED [2026-04-09 18:44:02.902]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:44:02.912] Generated YAML: chaos_partition_run5_dynamic.yaml
+[2026-04-09 18:44:02.914]   action=partition, direction=both, source=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+[2026-04-09 18:44:03.278] FAULT INJECTED at 2026-04-09 18:44:03.278: kubectl apply -f chaos_partition_run5_dynamic.yaml
+[2026-04-09 18:44:03.281] --- Polling every 5 s for 75 seconds (duration=60s + 15s buffer) ---
+[2026-04-09 18:44:08.388] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-09 18:44:16.568] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:44:16.571]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 at 2026-04-09 18:44:16.571
+[2026-04-09 18:44:24.665] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:44:32.811] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:44:40.753] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:44:48.808] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:44:56.880] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:06.050] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:14.052] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:19.209] Chaos object still present after 75 s - deleting manually ...
+[2026-04-09 18:45:19.520] FAULT REMOVED (manual) at 2026-04-09 18:45:19.520
+[2026-04-09 18:45:19.521] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:45:23.080] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:31.363] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:39.404] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:47.409] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:45:56.008] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:45:56.010] RECOVERY CONFIRMED at 2026-04-09 18:45:56.010: leader=zookeeper-2, recovery_seconds=112.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:45:56.011
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 112.7
+RECOVERY SECONDS: 112.7
+NOTES: new leader elected among followers: zookeeper-2
+[2026-04-09 18:45:56.021] Run complete - log saved to log_network_partition_run5.txt
+EXPERIMENT: cascading_failure
+RUN: 1
+START TIME: 2026-04-09 18:47:26.015
+[2026-04-09 18:47:26.019] PREFLIGHT attempt 1/6 at 2026-04-09 18:47:26.019
+[2026-04-09 18:47:26.217]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:47:29.078]     zookeeper-0: follower
+[2026-04-09 18:47:29.081]     zookeeper-1: follower
+[2026-04-09 18:47:29.082]     zookeeper-2: leader
+[2026-04-09 18:47:29.084]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-09 18:47:29.085] PREFLIGHT PASSED [2026-04-09 18:47:29.085]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-09 18:47:29.092] Plan: kill zookeeper-0 (follower), wait 10 s, then kill zookeeper-2 (leader). Surviving pod: zookeeper-1
+[2026-04-09 18:47:29.098] Generated YAML: chaos_cascade_follower_run1_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-09 18:47:29.100] Generated YAML: chaos_cascade_leader_run1_dynamic.yaml   (targeting leader zookeeper-2)
+
+--- PHASE 1: Kill follower ---
+[2026-04-09 18:47:29.447] FAULT INJECTED (1/2) at 2026-04-09 18:47:29.447: kubectl apply -f chaos_cascade_follower_run1_dynamic.yaml - killed zookeeper-0
+[2026-04-09 18:47:29.449] Waiting exactly 10 seconds before killing leader ...
+[2026-04-09 18:47:42.473] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:47:42.474]   Leader at 10 s mark: zookeeper-2 (zookeeper-0 is down, zookeeper-2 still up)
+
+--- PHASE 2: Kill leader (no quorum) ---
+[2026-04-09 18:47:42.688] FAULT INJECTED (2/2) at 2026-04-09 18:47:42.688: kubectl apply -f chaos_cascade_leader_run1_dynamic.yaml - killed zookeeper-2
+[2026-04-09 18:47:42.689] Time between follower kill and leader kill: 13.2 s
+[2026-04-09 18:47:42.690] 2/3 nodes are now down (zookeeper-0, zookeeper-2). Surviving node: zookeeper-1. NO QUORUM.
+[2026-04-09 18:47:42.690] --- Polling surviving pod (zookeeper-1) every 5 s for 60 s ---
+[2026-04-09 18:47:44.770] POLL 2026-04-09 18:47:44.770: zookeeper-1=leader
+[2026-04-09 18:47:44.772]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:47:50.344] POLL 2026-04-09 18:47:50.344: zookeeper-1=leader
+[2026-04-09 18:47:50.345]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:47:55.939] POLL 2026-04-09 18:47:55.939: zookeeper-1=leader
+[2026-04-09 18:47:55.939]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:01.558] POLL 2026-04-09 18:48:01.558: zookeeper-1=leader
+[2026-04-09 18:48:01.559]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:07.228] POLL 2026-04-09 18:48:07.228: zookeeper-1=leader
+[2026-04-09 18:48:07.230]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:12.864] POLL 2026-04-09 18:48:12.864: zookeeper-1=leader
+[2026-04-09 18:48:12.865]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:18.376] POLL 2026-04-09 18:48:18.376: zookeeper-1=leader
+[2026-04-09 18:48:18.377]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:24.073] POLL 2026-04-09 18:48:24.073: zookeeper-1=leader
+[2026-04-09 18:48:24.074]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:29.661] POLL 2026-04-09 18:48:29.661: zookeeper-1=leader
+[2026-04-09 18:48:29.661]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:35.265] POLL 2026-04-09 18:48:35.265: zookeeper-1=leader
+[2026-04-09 18:48:35.266]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:48:40.874] POLL 2026-04-09 18:48:40.874: zookeeper-1=leader
+[2026-04-09 18:48:40.874]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-09 18:48:46.326] FAULT REMOVED at 2026-04-09 18:48:46.102: kubectl delete -f chaos_cascade_follower_run1_dynamic.yaml
+[2026-04-09 18:48:46.327] FAULT REMOVED at 2026-04-09 18:48:46.326: kubectl delete -f chaos_cascade_leader_run1_dynamic.yaml
+[2026-04-09 18:48:46.327] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:48:48.276] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:48:48.277] RECOVERY CONFIRMED at 2026-04-09 18:48:48.277: leader=zookeeper-1, recovery_seconds=78.8s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:48:48.277
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 78.8
+RECOVERY SECONDS: 78.8 (from follower kill to confirmed leader)
+NOTES: time_between_kills=13.2s (target=10s); quorum_lost=no; WARNING: surviving pod unexpectedly reported leader/follower mode; post-recovery leader: zookeeper-1
+[2026-04-09 18:48:48.281] Run complete - log saved to log_cascading_failure_run1.txt
+EXPERIMENT: cascading_failure
+RUN: 2
+START TIME: 2026-04-09 18:50:18.272
+[2026-04-09 18:50:18.276] PREFLIGHT attempt 1/6 at 2026-04-09 18:50:18.276
+[2026-04-09 18:50:18.403]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-09 18:50:20.158]     zookeeper-0: follower
+[2026-04-09 18:50:20.159]     zookeeper-1: leader
+[2026-04-09 18:50:20.160]     zookeeper-2: follower
+[2026-04-09 18:50:20.160]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-09 18:50:20.161] PREFLIGHT PASSED [2026-04-09 18:50:20.161]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-09 18:50:20.165] Plan: kill zookeeper-0 (follower), wait 10 s, then kill zookeeper-1 (leader). Surviving pod: zookeeper-2
+[2026-04-09 18:50:20.166] Generated YAML: chaos_cascade_follower_run2_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-09 18:50:20.166] Generated YAML: chaos_cascade_leader_run2_dynamic.yaml   (targeting leader zookeeper-1)
+
+--- PHASE 1: Kill follower ---
+[2026-04-09 18:50:20.395] FAULT INJECTED (1/2) at 2026-04-09 18:50:20.395: kubectl apply -f chaos_cascade_follower_run2_dynamic.yaml - killed zookeeper-0
+[2026-04-09 18:50:20.397] Waiting exactly 10 seconds before killing leader ...
+[2026-04-09 18:50:32.359] POLL 10s mark after follower kill: zookeeper-0:not_running | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-09 18:50:32.360]   Leader at 10 s mark: zookeeper-1 (zookeeper-0 is down, zookeeper-1 still up)
+
+--- PHASE 2: Kill leader (no quorum) ---
+[2026-04-09 18:50:32.580] FAULT INJECTED (2/2) at 2026-04-09 18:50:32.580: kubectl apply -f chaos_cascade_leader_run2_dynamic.yaml - killed zookeeper-1
+[2026-04-09 18:50:32.581] Time between follower kill and leader kill: 12.2 s
+[2026-04-09 18:50:32.583] 2/3 nodes are now down (zookeeper-0, zookeeper-1). Surviving node: zookeeper-2. NO QUORUM.
+[2026-04-09 18:50:32.584] --- Polling surviving pod (zookeeper-2) every 5 s for 60 s ---
+[2026-04-09 18:50:34.714] POLL 2026-04-09 18:50:34.714: zookeeper-2=not_running
+[2026-04-09 18:50:34.715]   QUORUM LOST CONFIRMED: zookeeper-2 cannot report leader/follower (status=not_running)
+[2026-04-09 18:50:40.322] POLL 2026-04-09 18:50:40.322: zookeeper-2=not_running
+[2026-04-09 18:50:40.323]   QUORUM LOST CONFIRMED: zookeeper-2 cannot report leader/follower (status=not_running)
+[2026-04-09 18:50:48.230] POLL 2026-04-09 18:50:48.230: zookeeper-2=not_running
+[2026-04-09 18:50:48.231]   QUORUM LOST CONFIRMED: zookeeper-2 cannot report leader/follower (status=not_running)
+[2026-04-09 18:50:53.850] POLL 2026-04-09 18:50:53.850: zookeeper-2=leader
+[2026-04-09 18:50:53.851]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:01.341] POLL 2026-04-09 18:51:01.341: zookeeper-2=leader
+[2026-04-09 18:51:01.342]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:07.135] POLL 2026-04-09 18:51:07.135: zookeeper-2=leader
+[2026-04-09 18:51:07.135]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:12.916] POLL 2026-04-09 18:51:12.916: zookeeper-2=leader
+[2026-04-09 18:51:12.917]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:18.450] POLL 2026-04-09 18:51:18.450: zookeeper-2=leader
+[2026-04-09 18:51:18.451]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:24.018] POLL 2026-04-09 18:51:24.018: zookeeper-2=leader
+[2026-04-09 18:51:24.019]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-09 18:51:29.558] POLL 2026-04-09 18:51:29.558: zookeeper-2=leader
+[2026-04-09 18:51:29.559]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-09 18:51:35.032] FAULT REMOVED at 2026-04-09 18:51:34.795: kubectl delete -f chaos_cascade_follower_run2_dynamic.yaml
+[2026-04-09 18:51:35.033] FAULT REMOVED at 2026-04-09 18:51:35.032: kubectl delete -f chaos_cascade_leader_run2_dynamic.yaml
+[2026-04-09 18:51:35.033] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-09 18:51:36.636] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:51:43.260] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:51:49.832] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:51:56.151] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:52:02.651] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:52:09.149] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:error | zookeeper-2:leader
+[2026-04-09 18:52:20.731] RECOVERY POLL: pods_running=False | zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-09 18:52:27.546] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-09 18:52:27.547] RECOVERY CONFIRMED at 2026-04-09 18:52:27.547: leader=zookeeper-2, recovery_seconds=127.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-09 18:52:27.547
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 127.2
+RECOVERY SECONDS: 127.2 (from follower kill to confirmed leader)
+NOTES: time_between_kills=12.2s (target=10s); quorum_lost=yes; ZooKeeper correctly refused leadership with only 1/3 nodes alive; post-recovery leader: zookeeper-2
+[2026-04-09 18:52:27.549] Run complete - log saved to log_cascading_failure_run2.txt
+EXPERIMENT: cascading_failure
+RUN: 3
+START TIME: 2026-04-10 02:02:37.827
+[2026-04-10 02:02:37.868] PREFLIGHT attempt 1/6 at 2026-04-10 02:02:37.868
+[2026-04-10 02:02:38.919]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 02:02:45.094]     zookeeper-0: follower
+[2026-04-10 02:02:45.095]     zookeeper-1: follower
+[2026-04-10 02:02:45.095]     zookeeper-2: leader
+[2026-04-10 02:02:45.096]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 02:02:45.096] PREFLIGHT PASSED [2026-04-10 02:02:45.096]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 02:02:45.098] Plan: kill zookeeper-0 (follower), wait 10 s, then kill zookeeper-2 (leader). Surviving pod: zookeeper-1
+[2026-04-10 02:02:45.100] Generated YAML: chaos_cascade_follower_run3_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 02:02:45.100] Generated YAML: chaos_cascade_leader_run3_dynamic.yaml   (targeting leader zookeeper-2)
+
+--- PHASE 1: Kill follower ---
+[2026-04-10 02:02:45.426] FAULT INJECTED (1/2) at 2026-04-10 02:02:45.426: kubectl apply -f chaos_cascade_follower_run3_dynamic.yaml - killed zookeeper-0
+[2026-04-10 02:02:45.427] Waiting exactly 10 seconds before killing leader ...
+[2026-04-10 02:02:57.414] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 02:02:57.414]   Leader at 10 s mark: zookeeper-2 (zookeeper-0 is down, zookeeper-2 still up)
+
+--- PHASE 2: Kill leader (no quorum) ---
+[2026-04-10 02:02:57.614] FAULT INJECTED (2/2) at 2026-04-10 02:02:57.614: kubectl apply -f chaos_cascade_leader_run3_dynamic.yaml - killed zookeeper-2
+[2026-04-10 02:02:57.615] Time between follower kill and leader kill: 12.2 s
+[2026-04-10 02:02:57.616] 2/3 nodes are now down (zookeeper-0, zookeeper-2). Surviving node: zookeeper-1. NO QUORUM.
+[2026-04-10 02:02:57.617] --- Polling surviving pod (zookeeper-1) every 5 s for 60 s ---
+[2026-04-10 02:02:58.697] POLL 2026-04-10 02:02:58.696: zookeeper-1=leader
+[2026-04-10 02:02:58.697]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:04.499] POLL 2026-04-10 02:03:04.499: zookeeper-1=leader
+[2026-04-10 02:03:04.500]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:10.409] POLL 2026-04-10 02:03:10.409: zookeeper-1=leader
+[2026-04-10 02:03:10.410]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:16.402] POLL 2026-04-10 02:03:16.402: zookeeper-1=leader
+[2026-04-10 02:03:16.403]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:22.630] POLL 2026-04-10 02:03:22.630: zookeeper-1=leader
+[2026-04-10 02:03:22.631]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:28.609] POLL 2026-04-10 02:03:28.609: zookeeper-1=leader
+[2026-04-10 02:03:28.610]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:34.935] POLL 2026-04-10 02:03:34.935: zookeeper-1=leader
+[2026-04-10 02:03:34.936]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:40.835] POLL 2026-04-10 02:03:40.835: zookeeper-1=leader
+[2026-04-10 02:03:40.836]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:47.295] POLL 2026-04-10 02:03:47.295: zookeeper-1=leader
+[2026-04-10 02:03:47.296]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:03:53.725] POLL 2026-04-10 02:03:53.725: zookeeper-1=leader
+[2026-04-10 02:03:53.726]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-10 02:03:59.498] FAULT REMOVED at 2026-04-10 02:03:59.019: kubectl delete -f chaos_cascade_follower_run3_dynamic.yaml
+[2026-04-10 02:03:59.498] FAULT REMOVED at 2026-04-10 02:03:59.498: kubectl delete -f chaos_cascade_leader_run3_dynamic.yaml
+[2026-04-10 02:03:59.499] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 02:04:02.939] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 02:04:02.940] RECOVERY CONFIRMED at 2026-04-10 02:04:02.940: leader=zookeeper-1, recovery_seconds=77.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 02:04:02.940
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 77.5
+RECOVERY SECONDS: 77.5 (from follower kill to confirmed leader)
+NOTES: time_between_kills=12.2s (target=10s); quorum_lost=no; WARNING: surviving pod unexpectedly reported leader/follower mode; post-recovery leader: zookeeper-1
+[2026-04-10 02:04:02.945] Run complete - log saved to log_cascading_failure_run3.txt
+EXPERIMENT: cascading_failure
+RUN: 4
+START TIME: 2026-04-10 02:05:32.949
+[2026-04-10 02:05:32.953] PREFLIGHT attempt 1/6 at 2026-04-10 02:05:32.953
+[2026-04-10 02:05:33.094]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 02:05:35.409]     zookeeper-0: follower
+[2026-04-10 02:05:35.410]     zookeeper-1: leader
+[2026-04-10 02:05:35.411]     zookeeper-2: follower
+[2026-04-10 02:05:35.413]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 02:05:35.414] PREFLIGHT PASSED [2026-04-10 02:05:35.414]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 02:05:35.420] Plan: kill zookeeper-0 (follower), wait 10 s, then kill zookeeper-1 (leader). Surviving pod: zookeeper-2
+[2026-04-10 02:05:35.427] Generated YAML: chaos_cascade_follower_run4_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 02:05:35.429] Generated YAML: chaos_cascade_leader_run4_dynamic.yaml   (targeting leader zookeeper-1)
+
+--- PHASE 1: Kill follower ---
+[2026-04-10 02:05:35.701] FAULT INJECTED (1/2) at 2026-04-10 02:05:35.701: kubectl apply -f chaos_cascade_follower_run4_dynamic.yaml - killed zookeeper-0
+[2026-04-10 02:05:35.702] Waiting exactly 10 seconds before killing leader ...
+[2026-04-10 02:05:48.399] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 02:05:48.400]   Leader at 10 s mark: zookeeper-1 (zookeeper-0 is down, zookeeper-1 still up)
+
+--- PHASE 2: Kill leader (no quorum) ---
+[2026-04-10 02:05:48.655] FAULT INJECTED (2/2) at 2026-04-10 02:05:48.655: kubectl apply -f chaos_cascade_leader_run4_dynamic.yaml - killed zookeeper-1
+[2026-04-10 02:05:48.656] Time between follower kill and leader kill: 13.0 s
+[2026-04-10 02:05:48.656] 2/3 nodes are now down (zookeeper-0, zookeeper-1). Surviving node: zookeeper-2. NO QUORUM.
+[2026-04-10 02:05:48.656] --- Polling surviving pod (zookeeper-2) every 5 s for 60 s ---
+[2026-04-10 02:05:49.601] POLL 2026-04-10 02:05:49.601: zookeeper-2=not_running
+[2026-04-10 02:05:49.601]   QUORUM LOST CONFIRMED: zookeeper-2 cannot report leader/follower (status=not_running)
+[2026-04-10 02:05:55.424] POLL 2026-04-10 02:05:55.424: zookeeper-2=leader
+[2026-04-10 02:05:55.424]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:01.791] POLL 2026-04-10 02:06:01.791: zookeeper-2=leader
+[2026-04-10 02:06:01.792]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:08.123] POLL 2026-04-10 02:06:08.123: zookeeper-2=leader
+[2026-04-10 02:06:08.124]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:14.409] POLL 2026-04-10 02:06:14.409: zookeeper-2=leader
+[2026-04-10 02:06:14.410]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:20.719] POLL 2026-04-10 02:06:20.719: zookeeper-2=leader
+[2026-04-10 02:06:20.720]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:26.977] POLL 2026-04-10 02:06:26.977: zookeeper-2=leader
+[2026-04-10 02:06:26.979]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:33.191] POLL 2026-04-10 02:06:33.191: zookeeper-2=leader
+[2026-04-10 02:06:33.192]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:39.206] POLL 2026-04-10 02:06:39.206: zookeeper-2=leader
+[2026-04-10 02:06:39.206]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:06:45.422] POLL 2026-04-10 02:06:45.421: zookeeper-2=leader
+[2026-04-10 02:06:45.423]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-10 02:06:51.039] FAULT REMOVED at 2026-04-10 02:06:50.769: kubectl delete -f chaos_cascade_follower_run4_dynamic.yaml
+[2026-04-10 02:06:51.040] FAULT REMOVED at 2026-04-10 02:06:51.039: kubectl delete -f chaos_cascade_leader_run4_dynamic.yaml
+[2026-04-10 02:06:51.040] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 02:06:54.406] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 02:06:54.407] RECOVERY CONFIRMED at 2026-04-10 02:06:54.407: leader=zookeeper-2, recovery_seconds=78.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 02:06:54.408
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 78.7
+RECOVERY SECONDS: 78.7 (from follower kill to confirmed leader)
+NOTES: time_between_kills=13.0s (target=10s); quorum_lost=yes; ZooKeeper correctly refused leadership with only 1/3 nodes alive; post-recovery leader: zookeeper-2
+[2026-04-10 02:06:54.412] Run complete - log saved to log_cascading_failure_run4.txt
+EXPERIMENT: cascading_failure
+RUN: 5
+START TIME: 2026-04-10 02:08:24.415
+[2026-04-10 02:08:24.417] PREFLIGHT attempt 1/6 at 2026-04-10 02:08:24.417
+[2026-04-10 02:08:24.602]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 02:08:27.501]     zookeeper-0: follower
+[2026-04-10 02:08:27.502]     zookeeper-1: follower
+[2026-04-10 02:08:27.503]     zookeeper-2: leader
+[2026-04-10 02:08:27.504]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 02:08:27.505] PREFLIGHT PASSED [2026-04-10 02:08:27.505]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 02:08:27.508] Plan: kill zookeeper-0 (follower), wait 10 s, then kill zookeeper-2 (leader). Surviving pod: zookeeper-1
+[2026-04-10 02:08:27.511] Generated YAML: chaos_cascade_follower_run5_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 02:08:27.512] Generated YAML: chaos_cascade_leader_run5_dynamic.yaml   (targeting leader zookeeper-2)
+
+--- PHASE 1: Kill follower ---
+[2026-04-10 02:08:27.851] FAULT INJECTED (1/2) at 2026-04-10 02:08:27.851: kubectl apply -f chaos_cascade_follower_run5_dynamic.yaml - killed zookeeper-0
+[2026-04-10 02:08:27.852] Waiting exactly 10 seconds before killing leader ...
+[2026-04-10 02:08:41.170] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 02:08:41.172]   Leader at 10 s mark: zookeeper-2 (zookeeper-0 is down, zookeeper-2 still up)
+
+--- PHASE 2: Kill leader (no quorum) ---
+[2026-04-10 02:08:41.528] FAULT INJECTED (2/2) at 2026-04-10 02:08:41.528: kubectl apply -f chaos_cascade_leader_run5_dynamic.yaml - killed zookeeper-2
+[2026-04-10 02:08:41.529] Time between follower kill and leader kill: 13.7 s
+[2026-04-10 02:08:41.529] 2/3 nodes are now down (zookeeper-0, zookeeper-2). Surviving node: zookeeper-1. NO QUORUM.
+[2026-04-10 02:08:41.530] --- Polling surviving pod (zookeeper-1) every 5 s for 60 s ---
+[2026-04-10 02:08:44.978] POLL 2026-04-10 02:08:44.978: zookeeper-1=leader
+[2026-04-10 02:08:44.979]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:08:50.887] POLL 2026-04-10 02:08:50.887: zookeeper-1=leader
+[2026-04-10 02:08:50.888]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:08:56.725] POLL 2026-04-10 02:08:56.725: zookeeper-1=leader
+[2026-04-10 02:08:56.725]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:02.793] POLL 2026-04-10 02:09:02.792: zookeeper-1=leader
+[2026-04-10 02:09:02.794]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:08.924] POLL 2026-04-10 02:09:08.924: zookeeper-1=leader
+[2026-04-10 02:09:08.925]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:15.197] POLL 2026-04-10 02:09:15.197: zookeeper-1=leader
+[2026-04-10 02:09:15.198]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:21.166] POLL 2026-04-10 02:09:21.166: zookeeper-1=leader
+[2026-04-10 02:09:21.167]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:27.158] POLL 2026-04-10 02:09:27.157: zookeeper-1=leader
+[2026-04-10 02:09:27.158]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:33.017] POLL 2026-04-10 02:09:33.017: zookeeper-1=leader
+[2026-04-10 02:09:33.018]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+[2026-04-10 02:09:39.018] POLL 2026-04-10 02:09:39.018: zookeeper-1=leader
+[2026-04-10 02:09:39.018]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-10 02:09:44.587] FAULT REMOVED at 2026-04-10 02:09:44.298: kubectl delete -f chaos_cascade_follower_run5_dynamic.yaml
+[2026-04-10 02:09:44.588] FAULT REMOVED at 2026-04-10 02:09:44.587: kubectl delete -f chaos_cascade_leader_run5_dynamic.yaml
+[2026-04-10 02:09:44.588] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 02:09:47.762] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 02:09:47.763] RECOVERY CONFIRMED at 2026-04-10 02:09:47.763: leader=zookeeper-1, recovery_seconds=79.9s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 02:09:47.764
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+TOTAL DOWNTIME SECONDS: 79.9
+RECOVERY SECONDS: 79.9 (from follower kill to confirmed leader)
+NOTES: time_between_kills=13.7s (target=10s); quorum_lost=no; WARNING: surviving pod unexpectedly reported leader/follower mode; post-recovery leader: zookeeper-1
+[2026-04-10 02:09:47.768] Run complete - log saved to log_cascading_failure_run5.txt
+
+======================================================================
+ALL EXPERIMENTS COMPLETE: 2026-04-10 02:09:47.770

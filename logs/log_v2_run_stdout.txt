@@ -1,0 +1,1256 @@
+[2026-04-10 09:50:30.410] ====================================================
+[2026-04-10 09:50:30.410]  ZooKeeper Advanced Chaos Engineering Suite - v2
+[2026-04-10 09:50:30.410]  Polling: 1s parallel (ThreadPoolExecutor)
+[2026-04-10 09:50:30.410]  Master log : log_v2_all_experiments_master.txt
+[2026-04-10 09:50:30.410]  Results    : results_v2_live.csv
+[2026-04-10 09:50:30.410] ====================================================
+
+[2026-04-10 09:50:30.410] === EXPERIMENT A: KILL LEADER - 3 runs ===
+
+[2026-04-10 09:50:30.410] --- Kill Leader Run 1/3 ---
+TEST PURPOSE
+------------
+What: A ZooKeeper leader pod is forcibly killed via Chaos Mesh PodChaos.
+Why:  This directly tests ZAB (ZooKeeper Atomic Broadcast) leader election.
+      When the leader dies the two remaining followers must detect the loss
+      (via heartbeat timeout) and elect a new leader among themselves.
+      With 3 nodes, 2/3 constitutes majority; so 2 surviving nodes CAN
+      elect a new leader. We measure time-to-election at 1-second resolution.
+Academic significance:
+  - Validates ZAB quorum requirement (>50% majority needed)
+  - Measures leader election latency under pod failure
+  - Tests Kubernetes StatefulSet self-healing alongside ZK session management
+  - Expected: new leader elected within ~2-5 seconds; full recovery ~20-90s
+
+EXPERIMENT: kill_leader  [v2 - 1-second parallel polling]
+RUN: 1
+START TIME: 2026-04-10 09:50:30.410
+[2026-04-10 09:50:30.412] PREFLIGHT attempt 1/6 at 2026-04-10 09:50:30.412
+[2026-04-10 09:50:30.564]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 09:50:35.932]     zookeeper-0: follower
+[2026-04-10 09:50:35.933]     zookeeper-1: follower
+[2026-04-10 09:50:35.934]     zookeeper-2: leader
+[2026-04-10 09:50:35.934]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 09:50:35.935] PREFLIGHT PASSED [2026-04-10 09:50:35.935]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 09:50:35.939] Generated YAML: chaos_v2_kill_leader_run1_dynamic.yaml (targeting zookeeper-2)
+podchaos.chaos-mesh.org/v2-kill-leader-r1 created
+[2026-04-10 09:50:36.832] FAULT INJECTED at 2026-04-10 09:50:36.832: kubectl apply -f chaos_v2_kill_leader_run1_dynamic.yaml
+[2026-04-10 09:50:36.833] --- Polling every 1 s for 60 seconds (parallel) ---
+[2026-04-10 09:50:44.881] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:unknown
+[2026-04-10 09:50:53.339] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-10 09:50:53.341] NEW LEADER ELECTED: zookeeper-1 at 2026-04-10 09:50:53.341 [election_latency=16.509s from injection]
+[2026-04-10 09:50:58.640] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:error
+[2026-04-10 09:51:06.934] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 09:51:10.945] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:16.224] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:24.328] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:29.724] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:35.626] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:39.751] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+podchaos.chaos-mesh.org "v2-kill-leader-r1" deleted from default namespace
+[2026-04-10 09:51:40.993] FAULT REMOVED at 2026-04-10 09:51:40.993: kubectl delete -f chaos_v2_kill_leader_run1_dynamic.yaml
+[2026-04-10 09:51:40.994] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 09:51:44.328] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:51:44.329] RECOVERY CONFIRMED at 2026-04-10 09:51:44.329: leader=zookeeper-1, recovery_seconds=67.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 09:51:44.330
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 16.509
+RECOVERY SECONDS: 67.5
+NOTES: new leader elected during fault: zookeeper-1 (election_latency=16.509s)
+[2026-04-10 09:51:44.338] Run complete - log saved to log_v2_kill_leader_run1.txt
+[2026-04-10 09:51:44.339] Waiting 90s for stabilisation ...
+
+[2026-04-10 09:53:14.340] --- Kill Leader Run 2/3 ---
+TEST PURPOSE
+------------
+What: A ZooKeeper leader pod is forcibly killed via Chaos Mesh PodChaos.
+Why:  This directly tests ZAB (ZooKeeper Atomic Broadcast) leader election.
+      When the leader dies the two remaining followers must detect the loss
+      (via heartbeat timeout) and elect a new leader among themselves.
+      With 3 nodes, 2/3 constitutes majority; so 2 surviving nodes CAN
+      elect a new leader. We measure time-to-election at 1-second resolution.
+Academic significance:
+  - Validates ZAB quorum requirement (>50% majority needed)
+  - Measures leader election latency under pod failure
+  - Tests Kubernetes StatefulSet self-healing alongside ZK session management
+  - Expected: new leader elected within ~2-5 seconds; full recovery ~20-90s
+
+EXPERIMENT: kill_leader  [v2 - 1-second parallel polling]
+RUN: 2
+START TIME: 2026-04-10 09:53:14.341
+[2026-04-10 09:53:14.345] PREFLIGHT attempt 1/6 at 2026-04-10 09:53:14.345
+[2026-04-10 09:53:14.511]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 09:53:18.114]     zookeeper-0: follower
+[2026-04-10 09:53:18.116]     zookeeper-1: leader
+[2026-04-10 09:53:18.117]     zookeeper-2: follower
+[2026-04-10 09:53:18.118]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 09:53:18.119] PREFLIGHT PASSED [2026-04-10 09:53:18.119]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 09:53:18.122] Generated YAML: chaos_v2_kill_leader_run2_dynamic.yaml (targeting zookeeper-1)
+podchaos.chaos-mesh.org/v2-kill-leader-r2 created
+[2026-04-10 09:53:18.514] FAULT INJECTED at 2026-04-10 09:53:18.514: kubectl apply -f chaos_v2_kill_leader_run2_dynamic.yaml
+[2026-04-10 09:53:18.515] --- Polling every 1 s for 60 seconds (parallel) ---
+[2026-04-10 09:53:26.551] POLL: zookeeper-0:timeout | zookeeper-1:unknown | zookeeper-2:timeout
+[2026-04-10 09:53:35.582] POLL: zookeeper-0:timeout | zookeeper-1:error | zookeeper-2:timeout
+[2026-04-10 09:53:44.627] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:53:53.666] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:54:02.703] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:54:11.739] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:54:20.774] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+podchaos.chaos-mesh.org "v2-kill-leader-r2" deleted from default namespace
+[2026-04-10 09:54:23.501] FAULT REMOVED at 2026-04-10 09:54:23.501: kubectl delete -f chaos_v2_kill_leader_run2_dynamic.yaml
+[2026-04-10 09:54:23.502] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 09:54:31.842] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:54:41.246] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:54:50.838] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:00.234] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:09.539] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:18.929] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:28.331] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:37.732] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:47.232] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:55:57.030] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:06.533] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:16.134] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:25.629] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:35.331] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:44.819] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:56:54.321] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:57:03.918] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:57:13.321] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:57:23.024] RECOVERY POLL: pods_running=True | zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:57:24.025] RECOVERY TIMEOUT after 180.5s - cluster did not fully recover
+
+EXPERIMENT END TIME: 2026-04-10 09:57:24.026
+LEADER AT END: unknown
+LEADERSHIP CHANGED: no
+ELECTION LATENCY SECONDS: N/A
+RECOVERY SECONDS: 180.5
+NOTES: no leader change observed during 60s fault window; RECOVERY TIMEOUT
+[2026-04-10 09:57:24.029] Run complete - log saved to log_v2_kill_leader_run2.txt
+[2026-04-10 09:57:24.030] Waiting 90s for stabilisation ...
+
+[2026-04-10 09:58:54.030] --- Kill Leader Run 3/3 ---
+TEST PURPOSE
+------------
+What: A ZooKeeper leader pod is forcibly killed via Chaos Mesh PodChaos.
+Why:  This directly tests ZAB (ZooKeeper Atomic Broadcast) leader election.
+      When the leader dies the two remaining followers must detect the loss
+      (via heartbeat timeout) and elect a new leader among themselves.
+      With 3 nodes, 2/3 constitutes majority; so 2 surviving nodes CAN
+      elect a new leader. We measure time-to-election at 1-second resolution.
+Academic significance:
+  - Validates ZAB quorum requirement (>50% majority needed)
+  - Measures leader election latency under pod failure
+  - Tests Kubernetes StatefulSet self-healing alongside ZK session management
+  - Expected: new leader elected within ~2-5 seconds; full recovery ~20-90s
+
+EXPERIMENT: kill_leader  [v2 - 1-second parallel polling]
+RUN: 3
+START TIME: 2026-04-10 09:58:54.031
+[2026-04-10 09:58:54.034] PREFLIGHT attempt 1/6 at 2026-04-10 09:58:54.034
+[2026-04-10 09:58:54.222]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 09:58:58.678]     zookeeper-0: follower
+[2026-04-10 09:58:58.679]     zookeeper-1: follower
+[2026-04-10 09:58:58.679]     zookeeper-2: leader
+[2026-04-10 09:58:58.680]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 09:58:58.681] PREFLIGHT PASSED [2026-04-10 09:58:58.681]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 09:58:58.684] Generated YAML: chaos_v2_kill_leader_run3_dynamic.yaml (targeting zookeeper-2)
+podchaos.chaos-mesh.org/v2-kill-leader-r3 created
+[2026-04-10 09:58:59.029] FAULT INJECTED at 2026-04-10 09:58:59.029: kubectl apply -f chaos_v2_kill_leader_run3_dynamic.yaml
+[2026-04-10 09:58:59.031] --- Polling every 1 s for 60 seconds (parallel) ---
+[2026-04-10 09:59:04.280] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:unknown
+[2026-04-10 09:59:04.282] NEW LEADER ELECTED: zookeeper-1 at 2026-04-10 09:59:04.282 [election_latency=5.252s from injection]
+[2026-04-10 09:59:10.973] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 09:59:17.784] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:22.782] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:27.869] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:36.909] POLL: zookeeper-0:timeout | zookeeper-1:timeout | zookeeper-2:timeout
+[2026-04-10 09:59:44.277] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:49.263] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:54.477] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 09:59:59.492] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+podchaos.chaos-mesh.org "v2-kill-leader-r3" deleted from default namespace
+[2026-04-10 10:00:00.814] FAULT REMOVED at 2026-04-10 10:00:00.814: kubectl delete -f chaos_v2_kill_leader_run3_dynamic.yaml
+[2026-04-10 10:00:00.814] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 10:00:05.190] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:00:05.191] RECOVERY CONFIRMED at 2026-04-10 10:00:05.191: leader=zookeeper-1, recovery_seconds=66.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 10:00:05.192
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 5.252
+RECOVERY SECONDS: 66.2
+NOTES: new leader elected during fault: zookeeper-1 (election_latency=5.252s)
+[2026-04-10 10:00:05.196] Run complete - log saved to log_v2_kill_leader_run3.txt
+
+[2026-04-10 10:00:05.197] === EXPERIMENT A COMPLETE ===
+[2026-04-10 10:00:05.197] Waiting 90s before Experiment B ...
+
+[2026-04-10 10:01:35.198] === EXPERIMENT B: NETWORK PARTITION - 3 runs ===
+
+[2026-04-10 10:01:35.198] --- Network Partition Run 1/3 ---
+TEST PURPOSE
+------------
+What: A NetworkChaos partition isolates the ZooKeeper leader from both followers.
+      The leader can no longer communicate with any other ensemble member.
+Why:  This creates a classic split-brain scenario. The isolated leader has
+      only 1/3 votes (minority). The two followers have 2/3 (majority) and
+      MUST elect a new leader among themselves. The original leader should
+      step down to LOOKING state once it cannot reach a quorum.
+Academic significance:
+  - Tests ZAB's protection against split-brain (two simultaneous leaders)
+  - Measures whether Chaos Mesh duration field auto-expires chaos objects
+  - Captures the window where both sides may briefly report "leader"
+  - Expected: new leader elected on follower side within ~5-15 seconds
+
+EXPERIMENT: network_partition  [v2 - 1-second parallel polling]
+RUN: 1
+START TIME: 2026-04-10 10:01:35.199
+[2026-04-10 10:01:35.201] PREFLIGHT attempt 1/6 at 2026-04-10 10:01:35.201
+[2026-04-10 10:01:35.557]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 10:01:41.688]     zookeeper-0: follower
+[2026-04-10 10:01:41.689]     zookeeper-1: leader
+[2026-04-10 10:01:41.689]     zookeeper-2: follower
+[2026-04-10 10:01:41.690]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 10:01:41.690] PREFLIGHT PASSED [2026-04-10 10:01:41.690]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 10:01:41.692] Generated YAML: chaos_v2_partition_run1_dynamic.yaml
+[2026-04-10 10:01:41.693]   action=partition, direction=both, isolated=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+networkchaos.chaos-mesh.org/v2-partition-r1 created
+[2026-04-10 10:01:42.074] FAULT INJECTED at 2026-04-10 10:01:42.073: kubectl apply -f chaos_v2_partition_run1_dynamic.yaml
+[2026-04-10 10:01:42.075] --- Polling every 1 s for 75 seconds (duration=60s + 15s buffer, parallel) ---
+[2026-04-10 10:01:47.872] POLL: zookeeper-0:not_running | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:01:53.175] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:01:53.176]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 [election_latency=11.103s]
+[2026-04-10 10:01:57.961] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:03.256] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:08.375] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:13.278] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:18.151] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:23.260] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:28.350] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:33.346] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:38.466] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:43.955] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:02:49.146] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:02:54.456] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:02:59.565] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:03:00.729] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-partition-r1" deleted from default namespace
+[2026-04-10 10:03:00.959] FAULT REMOVED (manual) at 2026-04-10 10:03:00.959
+[2026-04-10 10:03:00.960] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 10:03:05.562] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:03:05.563] RECOVERY CONFIRMED at 2026-04-10 10:03:05.563: leader=zookeeper-2, recovery_seconds=83.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 10:03:05.564
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 11.103
+RECOVERY SECONDS: 83.5
+NOTES: new leader among followers: zookeeper-2 (election_latency=11.103s)
+[2026-04-10 10:03:05.567] Run complete - log saved to log_v2_network_partition_run1.txt
+[2026-04-10 10:03:05.568] Waiting 90s for stabilisation ...
+
+[2026-04-10 10:04:35.568] --- Network Partition Run 2/3 ---
+TEST PURPOSE
+------------
+What: A NetworkChaos partition isolates the ZooKeeper leader from both followers.
+      The leader can no longer communicate with any other ensemble member.
+Why:  This creates a classic split-brain scenario. The isolated leader has
+      only 1/3 votes (minority). The two followers have 2/3 (majority) and
+      MUST elect a new leader among themselves. The original leader should
+      step down to LOOKING state once it cannot reach a quorum.
+Academic significance:
+  - Tests ZAB's protection against split-brain (two simultaneous leaders)
+  - Measures whether Chaos Mesh duration field auto-expires chaos objects
+  - Captures the window where both sides may briefly report "leader"
+  - Expected: new leader elected on follower side within ~5-15 seconds
+
+EXPERIMENT: network_partition  [v2 - 1-second parallel polling]
+RUN: 2
+START TIME: 2026-04-10 10:04:35.569
+[2026-04-10 10:04:35.573] PREFLIGHT attempt 1/6 at 2026-04-10 10:04:35.573
+[2026-04-10 10:04:35.840]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 10:04:40.127]     zookeeper-0: follower
+[2026-04-10 10:04:40.129]     zookeeper-1: follower
+[2026-04-10 10:04:40.130]     zookeeper-2: leader
+[2026-04-10 10:04:40.132]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 10:04:40.133] PREFLIGHT PASSED [2026-04-10 10:04:40.133]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 10:04:40.137] Generated YAML: chaos_v2_partition_run2_dynamic.yaml
+[2026-04-10 10:04:40.138]   action=partition, direction=both, isolated=zookeeper-2, target=['zookeeper-0', 'zookeeper-1'], duration=60s
+networkchaos.chaos-mesh.org/v2-partition-r2 created
+[2026-04-10 10:04:40.790] FAULT INJECTED at 2026-04-10 10:04:40.790: kubectl apply -f chaos_v2_partition_run2_dynamic.yaml
+[2026-04-10 10:04:40.791] --- Polling every 1 s for 75 seconds (duration=60s + 15s buffer, parallel) ---
+[2026-04-10 10:04:47.732] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:04:54.572] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:04:54.573]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-1 [election_latency=13.783s]
+[2026-04-10 10:04:58.131] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:02.155] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:06.044] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:09.847] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:13.366] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:17.032] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:20.626] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:24.234] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:28.250] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:31.737] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:35.224] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:38.958] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:not_running
+[2026-04-10 10:05:43.662] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:05:47.424] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:05:51.364] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:05:55.229] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:05:56.370] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-partition-r2" deleted from default namespace
+[2026-04-10 10:05:56.599] FAULT REMOVED (manual) at 2026-04-10 10:05:56.599
+[2026-04-10 10:05:56.600] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 10:05:59.822] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:05:59.823] RECOVERY CONFIRMED at 2026-04-10 10:05:59.823: leader=zookeeper-1, recovery_seconds=79.0s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 10:05:59.824
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 13.783
+RECOVERY SECONDS: 79.0
+NOTES: new leader among followers: zookeeper-1 (election_latency=13.783s)
+[2026-04-10 10:05:59.834] Run complete - log saved to log_v2_network_partition_run2.txt
+[2026-04-10 10:05:59.835] Waiting 90s for stabilisation ...
+
+[2026-04-10 10:07:29.835] --- Network Partition Run 3/3 ---
+TEST PURPOSE
+------------
+What: A NetworkChaos partition isolates the ZooKeeper leader from both followers.
+      The leader can no longer communicate with any other ensemble member.
+Why:  This creates a classic split-brain scenario. The isolated leader has
+      only 1/3 votes (minority). The two followers have 2/3 (majority) and
+      MUST elect a new leader among themselves. The original leader should
+      step down to LOOKING state once it cannot reach a quorum.
+Academic significance:
+  - Tests ZAB's protection against split-brain (two simultaneous leaders)
+  - Measures whether Chaos Mesh duration field auto-expires chaos objects
+  - Captures the window where both sides may briefly report "leader"
+  - Expected: new leader elected on follower side within ~5-15 seconds
+
+EXPERIMENT: network_partition  [v2 - 1-second parallel polling]
+RUN: 3
+START TIME: 2026-04-10 10:07:29.836
+[2026-04-10 10:07:29.841] PREFLIGHT attempt 1/6 at 2026-04-10 10:07:29.841
+[2026-04-10 10:07:30.513]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 10:07:36.410]     zookeeper-0: follower
+[2026-04-10 10:07:36.411]     zookeeper-1: leader
+[2026-04-10 10:07:36.411]     zookeeper-2: follower
+[2026-04-10 10:07:36.412]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 10:07:36.412] PREFLIGHT PASSED [2026-04-10 10:07:36.412]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 10:07:36.415] Generated YAML: chaos_v2_partition_run3_dynamic.yaml
+[2026-04-10 10:07:36.416]   action=partition, direction=both, isolated=zookeeper-1, target=['zookeeper-0', 'zookeeper-2'], duration=60s
+networkchaos.chaos-mesh.org/v2-partition-r3 created
+[2026-04-10 10:07:36.720] FAULT INJECTED at 2026-04-10 10:07:36.720: kubectl apply -f chaos_v2_partition_run3_dynamic.yaml
+[2026-04-10 10:07:36.721] --- Polling every 1 s for 75 seconds (duration=60s + 15s buffer, parallel) ---
+[2026-04-10 10:07:42.714] POLL: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:07:50.238] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:07:50.239]   NEW LEADER ELECTED AMONG FOLLOWERS: zookeeper-2 [election_latency=13.519s]
+[2026-04-10 10:07:58.825] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:02.918] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:07.036] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:10.511] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:14.139] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:17.722] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:21.303] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:24.617] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:28.217] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:31.624] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:35.248] POLL: zookeeper-0:follower | zookeeper-1:not_running | zookeeper-2:leader
+[2026-04-10 10:08:39.112] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:42.905] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:46.905] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:50.718] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:54.529] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:55.662] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-partition-r3" deleted from default namespace
+[2026-04-10 10:08:55.952] FAULT REMOVED (manual) at 2026-04-10 10:08:55.952
+[2026-04-10 10:08:55.953] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 10:08:59.415] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:08:59.417] RECOVERY CONFIRMED at 2026-04-10 10:08:59.417: leader=zookeeper-2, recovery_seconds=82.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 10:08:59.419
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+ELECTION LATENCY SECONDS: 13.519
+RECOVERY SECONDS: 82.7
+NOTES: new leader among followers: zookeeper-2 (election_latency=13.519s)
+[2026-04-10 10:08:59.429] Run complete - log saved to log_v2_network_partition_run3.txt
+
+[2026-04-10 10:08:59.431] === EXPERIMENT B COMPLETE ===
+[2026-04-10 10:08:59.431] Waiting 90s before Experiment C ...
+
+[2026-04-10 10:57:05.777] === EXPERIMENT C: CASCADING FAILURE - 3 runs ===
+
+[2026-04-10 10:57:05.777] --- Cascading Failure Run 1/3 ---
+TEST PURPOSE
+------------
+What: A follower is killed first; 10 seconds later the leader is also killed.
+      Only 1 of 3 nodes remains alive, which cannot reach quorum (1/3 < 50%).
+Why:  This tests ZooKeeper's behavior when quorum is permanently lost.
+      The single surviving node must recognize it cannot form a quorum and
+      refuse to accept writes or serve as leader/follower.
+Academic significance:
+  - Validates quorum loss detection (surviving pod should go to LOOKING/error)
+  - Tests Kubernetes pod restart speed vs ZK session timeout interaction
+  - Cascading failures are common in real outage scenarios (first one node,
+    then operators/runbooks kill more, losing quorum)
+  - Note: PodChaos triggers instant K8s restart; pods may rejoin before ZK
+    detects quorum loss if restart is faster than ZK session timeout (~30s)
+
+EXPERIMENT: cascading_failure  [v2 - 1-second parallel polling]
+RUN: 1
+START TIME: 2026-04-10 10:57:05.777
+[2026-04-10 10:57:05.781] PREFLIGHT attempt 1/6 at 2026-04-10 10:57:05.781
+[2026-04-10 10:57:06.220]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 10:57:11.334]     zookeeper-0: follower
+[2026-04-10 10:57:11.335]     zookeeper-1: follower
+[2026-04-10 10:57:11.335]     zookeeper-2: leader
+[2026-04-10 10:57:11.336]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 10:57:11.337] PREFLIGHT PASSED [2026-04-10 10:57:11.337]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 10:57:11.339] Plan: kill zookeeper-0 (follower), wait 10s, then kill zookeeper-2 (leader). Surviving pod: zookeeper-1
+[2026-04-10 10:57:11.341] Generated YAML: chaos_v2_cascade_follower_run1_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 10:57:11.342] Generated YAML: chaos_v2_cascade_leader_run1_dynamic.yaml   (targeting leader zookeeper-2)
+
+--- PHASE 1: Kill follower ---
+podchaos.chaos-mesh.org/v2-cascade-follower-r1 created
+[2026-04-10 10:57:11.681] FAULT INJECTED (1/2) at 2026-04-10 10:57:11.681: killed zookeeper-0
+[2026-04-10 10:57:11.681] Waiting 10 seconds before killing leader ...
+[2026-04-10 10:57:25.719] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 10:57:25.719]   Leader at 10s: zookeeper-2
+
+--- PHASE 2: Kill leader (quorum now impossible with 1/3 alive) ---
+podchaos.chaos-mesh.org/v2-cascade-leader-r1 created
+[2026-04-10 10:57:25.954] FAULT INJECTED (2/2) at 2026-04-10 10:57:25.954: killed zookeeper-2
+[2026-04-10 10:57:25.955] Time between follower kill and leader kill: 14.3s
+[2026-04-10 10:57:25.956] 2/3 nodes are now down (zookeeper-0, zookeeper-2). Surviving node: zookeeper-1. NO QUORUM possible.
+[2026-04-10 10:57:25.957] --- Polling surviving pod (zookeeper-1) every 1s for 60s ---
+[2026-04-10 10:57:28.936] POLL: zookeeper-1=leader
+[2026-04-10 10:57:28.936]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:31.738] POLL: zookeeper-1=leader
+[2026-04-10 10:57:31.740]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:36.023] POLL: zookeeper-1=leader
+[2026-04-10 10:57:36.027]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:38.362] POLL: zookeeper-1=leader
+[2026-04-10 10:57:38.363]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:40.746] POLL: zookeeper-1=leader
+[2026-04-10 10:57:40.747]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:42.543] POLL: zookeeper-1=leader
+[2026-04-10 10:57:42.544]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:44.319] POLL: zookeeper-1=leader
+[2026-04-10 10:57:44.320]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:46.006] POLL: zookeeper-1=leader
+[2026-04-10 10:57:46.007]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:47.702] POLL: zookeeper-1=leader
+[2026-04-10 10:57:47.702]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:49.445] POLL: zookeeper-1=leader
+[2026-04-10 10:57:49.446]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:51.221] POLL: zookeeper-1=leader
+[2026-04-10 10:57:51.222]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:53.251] POLL: zookeeper-1=leader
+[2026-04-10 10:57:53.252]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:55.162] POLL: zookeeper-1=leader
+[2026-04-10 10:57:55.163]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:57.065] POLL: zookeeper-1=leader
+[2026-04-10 10:57:57.066]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:57:59.122] POLL: zookeeper-1=leader
+[2026-04-10 10:57:59.124]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:01.149] POLL: zookeeper-1=leader
+[2026-04-10 10:58:01.150]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:03.113] POLL: zookeeper-1=leader
+[2026-04-10 10:58:03.115]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:05.169] POLL: zookeeper-1=leader
+[2026-04-10 10:58:05.170]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:07.050] POLL: zookeeper-1=leader
+[2026-04-10 10:58:07.051]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:09.536] POLL: zookeeper-1=leader
+[2026-04-10 10:58:09.537]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:11.518] POLL: zookeeper-1=leader
+[2026-04-10 10:58:11.519]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:13.205] POLL: zookeeper-1=leader
+[2026-04-10 10:58:13.205]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:14.957] POLL: zookeeper-1=leader
+[2026-04-10 10:58:14.958]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:16.697] POLL: zookeeper-1=leader
+[2026-04-10 10:58:16.698]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:18.542] POLL: zookeeper-1=leader
+[2026-04-10 10:58:18.543]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:20.199] POLL: zookeeper-1=leader
+[2026-04-10 10:58:20.201]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:21.832] POLL: zookeeper-1=leader
+[2026-04-10 10:58:21.833]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:23.549] POLL: zookeeper-1=leader
+[2026-04-10 10:58:23.550]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 10:58:25.247] POLL: zookeeper-1=leader
+[2026-04-10 10:58:25.248]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+
+--- PHASE 3: Remove both faults and recover ---
+podchaos.chaos-mesh.org "v2-cascade-follower-r1" deleted from default namespace
+podchaos.chaos-mesh.org "v2-cascade-leader-r1" deleted from default namespace
+[2026-04-10 10:58:26.741] FAULT REMOVED at 2026-04-10 10:58:26.494: deleted chaos_v2_cascade_follower_run1_dynamic.yaml
+[2026-04-10 10:58:26.742] FAULT REMOVED at 2026-04-10 10:58:26.741: deleted chaos_v2_cascade_leader_run1_dynamic.yaml
+[2026-04-10 10:58:26.743] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 10:58:30.933] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 10:58:30.935] RECOVERY CONFIRMED at 2026-04-10 10:58:30.935: leader=zookeeper-1, recovery_seconds=79.3s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 10:58:30.936
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+RECOVERY SECONDS: 79.3 (from follower kill)
+NOTES: time_between_kills=14.3s (target=10s); quorum_lost=no (pod restarted faster than ZK session timeout); post-recovery leader: zookeeper-1
+[2026-04-10 10:58:30.942] Run complete - log saved to log_v2_cascading_failure_run1.txt
+[2026-04-10 10:58:30.942] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:00:00.943] --- Cascading Failure Run 2/3 ---
+TEST PURPOSE
+------------
+What: A follower is killed first; 10 seconds later the leader is also killed.
+      Only 1 of 3 nodes remains alive, which cannot reach quorum (1/3 < 50%).
+Why:  This tests ZooKeeper's behavior when quorum is permanently lost.
+      The single surviving node must recognize it cannot form a quorum and
+      refuse to accept writes or serve as leader/follower.
+Academic significance:
+  - Validates quorum loss detection (surviving pod should go to LOOKING/error)
+  - Tests Kubernetes pod restart speed vs ZK session timeout interaction
+  - Cascading failures are common in real outage scenarios (first one node,
+    then operators/runbooks kill more, losing quorum)
+  - Note: PodChaos triggers instant K8s restart; pods may rejoin before ZK
+    detects quorum loss if restart is faster than ZK session timeout (~30s)
+
+EXPERIMENT: cascading_failure  [v2 - 1-second parallel polling]
+RUN: 2
+START TIME: 2026-04-10 11:00:00.943
+[2026-04-10 11:00:00.946] PREFLIGHT attempt 1/6 at 2026-04-10 11:00:00.946
+[2026-04-10 11:00:01.080]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 11:00:04.793]     zookeeper-0: follower
+[2026-04-10 11:00:04.795]     zookeeper-1: leader
+[2026-04-10 11:00:04.796]     zookeeper-2: follower
+[2026-04-10 11:00:04.797]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 11:00:04.798] PREFLIGHT PASSED [2026-04-10 11:00:04.798]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 11:00:04.804] Plan: kill zookeeper-0 (follower), wait 10s, then kill zookeeper-1 (leader). Surviving pod: zookeeper-2
+[2026-04-10 11:00:04.806] Generated YAML: chaos_v2_cascade_follower_run2_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 11:00:04.807] Generated YAML: chaos_v2_cascade_leader_run2_dynamic.yaml   (targeting leader zookeeper-1)
+
+--- PHASE 1: Kill follower ---
+podchaos.chaos-mesh.org/v2-cascade-follower-r2 created
+[2026-04-10 11:00:05.137] FAULT INJECTED (1/2) at 2026-04-10 11:00:05.137: killed zookeeper-0
+[2026-04-10 11:00:05.139] Waiting 10 seconds before killing leader ...
+[2026-04-10 11:00:18.830] POLL 10s mark after follower kill: zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 11:00:18.831]   Leader at 10s: zookeeper-1
+
+--- PHASE 2: Kill leader (quorum now impossible with 1/3 alive) ---
+podchaos.chaos-mesh.org/v2-cascade-leader-r2 created
+[2026-04-10 11:00:19.198] FAULT INJECTED (2/2) at 2026-04-10 11:00:19.198: killed zookeeper-1
+[2026-04-10 11:00:19.200] Time between follower kill and leader kill: 14.1s
+[2026-04-10 11:00:19.201] 2/3 nodes are now down (zookeeper-0, zookeeper-1). Surviving node: zookeeper-2. NO QUORUM possible.
+[2026-04-10 11:00:19.203] --- Polling surviving pod (zookeeper-2) every 1s for 60s ---
+[2026-04-10 11:00:22.797] POLL: zookeeper-2=leader
+[2026-04-10 11:00:22.799]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:26.009] POLL: zookeeper-2=leader
+[2026-04-10 11:00:26.010]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:28.599] POLL: zookeeper-2=leader
+[2026-04-10 11:00:28.600]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:30.333] POLL: zookeeper-2=leader
+[2026-04-10 11:00:30.334]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:32.232] POLL: zookeeper-2=leader
+[2026-04-10 11:00:32.233]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:34.051] POLL: zookeeper-2=leader
+[2026-04-10 11:00:34.052]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:36.114] POLL: zookeeper-2=leader
+[2026-04-10 11:00:36.116]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:38.134] POLL: zookeeper-2=leader
+[2026-04-10 11:00:38.135]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:40.199] POLL: zookeeper-2=leader
+[2026-04-10 11:00:40.200]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:42.215] POLL: zookeeper-2=leader
+[2026-04-10 11:00:42.216]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:44.025] POLL: zookeeper-2=leader
+[2026-04-10 11:00:44.027]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:45.857] POLL: zookeeper-2=leader
+[2026-04-10 11:00:45.858]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:47.728] POLL: zookeeper-2=leader
+[2026-04-10 11:00:47.730]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:49.656] POLL: zookeeper-2=leader
+[2026-04-10 11:00:49.657]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:51.712] POLL: zookeeper-2=leader
+[2026-04-10 11:00:51.714]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:53.847] POLL: zookeeper-2=leader
+[2026-04-10 11:00:53.848]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:55.822] POLL: zookeeper-2=leader
+[2026-04-10 11:00:55.824]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:00:58.296] POLL: zookeeper-2=leader
+[2026-04-10 11:00:58.298]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:00.526] POLL: zookeeper-2=leader
+[2026-04-10 11:01:00.527]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:02.737] POLL: zookeeper-2=leader
+[2026-04-10 11:01:02.739]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:04.690] POLL: zookeeper-2=leader
+[2026-04-10 11:01:04.691]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:06.528] POLL: zookeeper-2=leader
+[2026-04-10 11:01:06.530]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:08.351] POLL: zookeeper-2=leader
+[2026-04-10 11:01:08.352]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:10.409] POLL: zookeeper-2=leader
+[2026-04-10 11:01:10.411]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:12.527] POLL: zookeeper-2=leader
+[2026-04-10 11:01:12.531]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:14.498] POLL: zookeeper-2=leader
+[2026-04-10 11:01:14.499]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:16.435] POLL: zookeeper-2=leader
+[2026-04-10 11:01:16.436]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:01:18.228] POLL: zookeeper-2=leader
+[2026-04-10 11:01:18.229]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+
+--- PHASE 3: Remove both faults and recover ---
+podchaos.chaos-mesh.org "v2-cascade-follower-r2" deleted from default namespace
+podchaos.chaos-mesh.org "v2-cascade-leader-r2" deleted from default namespace
+[2026-04-10 11:01:19.826] FAULT REMOVED at 2026-04-10 11:01:19.540: deleted chaos_v2_cascade_follower_run2_dynamic.yaml
+[2026-04-10 11:01:19.827] FAULT REMOVED at 2026-04-10 11:01:19.826: deleted chaos_v2_cascade_leader_run2_dynamic.yaml
+[2026-04-10 11:01:19.828] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 11:01:23.899] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:01:23.900] RECOVERY CONFIRMED at 2026-04-10 11:01:23.900: leader=zookeeper-2, recovery_seconds=78.8s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:01:23.902
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+RECOVERY SECONDS: 78.8 (from follower kill)
+NOTES: time_between_kills=14.1s (target=10s); quorum_lost=no (pod restarted faster than ZK session timeout); post-recovery leader: zookeeper-2
+[2026-04-10 11:01:23.910] Run complete - log saved to log_v2_cascading_failure_run2.txt
+[2026-04-10 11:01:23.911] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:02:53.912] --- Cascading Failure Run 3/3 ---
+TEST PURPOSE
+------------
+What: A follower is killed first; 10 seconds later the leader is also killed.
+      Only 1 of 3 nodes remains alive, which cannot reach quorum (1/3 < 50%).
+Why:  This tests ZooKeeper's behavior when quorum is permanently lost.
+      The single surviving node must recognize it cannot form a quorum and
+      refuse to accept writes or serve as leader/follower.
+Academic significance:
+  - Validates quorum loss detection (surviving pod should go to LOOKING/error)
+  - Tests Kubernetes pod restart speed vs ZK session timeout interaction
+  - Cascading failures are common in real outage scenarios (first one node,
+    then operators/runbooks kill more, losing quorum)
+  - Note: PodChaos triggers instant K8s restart; pods may rejoin before ZK
+    detects quorum loss if restart is faster than ZK session timeout (~30s)
+
+EXPERIMENT: cascading_failure  [v2 - 1-second parallel polling]
+RUN: 3
+START TIME: 2026-04-10 11:02:53.913
+[2026-04-10 11:02:53.917] PREFLIGHT attempt 1/6 at 2026-04-10 11:02:53.917
+[2026-04-10 11:02:54.079]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 11:02:58.100]     zookeeper-0: follower
+[2026-04-10 11:02:58.101]     zookeeper-1: follower
+[2026-04-10 11:02:58.103]     zookeeper-2: leader
+[2026-04-10 11:02:58.104]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 11:02:58.105] PREFLIGHT PASSED [2026-04-10 11:02:58.105]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 11:02:58.110] Plan: kill zookeeper-0 (follower), wait 10s, then kill zookeeper-2 (leader). Surviving pod: zookeeper-1
+[2026-04-10 11:02:58.113] Generated YAML: chaos_v2_cascade_follower_run3_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 11:02:58.114] Generated YAML: chaos_v2_cascade_leader_run3_dynamic.yaml   (targeting leader zookeeper-2)
+
+--- PHASE 1: Kill follower ---
+podchaos.chaos-mesh.org/v2-cascade-follower-r3 created
+[2026-04-10 11:02:58.425] FAULT INJECTED (1/2) at 2026-04-10 11:02:58.425: killed zookeeper-0
+[2026-04-10 11:02:58.427] Waiting 10 seconds before killing leader ...
+[2026-04-10 11:03:13.978] POLL 10s mark after follower kill: zookeeper-0:not_running | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:03:13.979]   Leader at 10s: zookeeper-2
+
+--- PHASE 2: Kill leader (quorum now impossible with 1/3 alive) ---
+podchaos.chaos-mesh.org/v2-cascade-leader-r3 created
+[2026-04-10 11:03:14.287] FAULT INJECTED (2/2) at 2026-04-10 11:03:14.287: killed zookeeper-2
+[2026-04-10 11:03:14.288] Time between follower kill and leader kill: 15.9s
+[2026-04-10 11:03:14.289] 2/3 nodes are now down (zookeeper-0, zookeeper-2). Surviving node: zookeeper-1. NO QUORUM possible.
+[2026-04-10 11:03:14.290] --- Polling surviving pod (zookeeper-1) every 1s for 60s ---
+[2026-04-10 11:03:19.279] POLL: zookeeper-1=not_running
+[2026-04-10 11:03:19.281]   QUORUM LOST CONFIRMED: zookeeper-1 cannot report leader/follower (status=not_running)
+[2026-04-10 11:03:22.577] POLL: zookeeper-1=leader
+[2026-04-10 11:03:22.578]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:26.675] POLL: zookeeper-1=leader
+[2026-04-10 11:03:26.676]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:28.601] POLL: zookeeper-1=leader
+[2026-04-10 11:03:28.602]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:30.700] POLL: zookeeper-1=leader
+[2026-04-10 11:03:30.701]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:32.614] POLL: zookeeper-1=leader
+[2026-04-10 11:03:32.615]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:34.673] POLL: zookeeper-1=leader
+[2026-04-10 11:03:34.675]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:36.514] POLL: zookeeper-1=leader
+[2026-04-10 11:03:36.516]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:38.491] POLL: zookeeper-1=leader
+[2026-04-10 11:03:38.492]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:40.583] POLL: zookeeper-1=leader
+[2026-04-10 11:03:40.584]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:42.376] POLL: zookeeper-1=leader
+[2026-04-10 11:03:42.377]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:43.977] POLL: zookeeper-1=leader
+[2026-04-10 11:03:43.978]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:45.596] POLL: zookeeper-1=leader
+[2026-04-10 11:03:45.596]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:47.194] POLL: zookeeper-1=leader
+[2026-04-10 11:03:47.195]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:48.866] POLL: zookeeper-1=leader
+[2026-04-10 11:03:48.867]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:50.609] POLL: zookeeper-1=leader
+[2026-04-10 11:03:50.610]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:52.196] POLL: zookeeper-1=leader
+[2026-04-10 11:03:52.197]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:53.792] POLL: zookeeper-1=leader
+[2026-04-10 11:03:53.793]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:55.411] POLL: zookeeper-1=leader
+[2026-04-10 11:03:55.412]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:57.094] POLL: zookeeper-1=leader
+[2026-04-10 11:03:57.095]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:03:58.793] POLL: zookeeper-1=leader
+[2026-04-10 11:03:58.794]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:00.670] POLL: zookeeper-1=leader
+[2026-04-10 11:04:00.671]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:02.277] POLL: zookeeper-1=leader
+[2026-04-10 11:04:02.277]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:04.083] POLL: zookeeper-1=leader
+[2026-04-10 11:04:04.084]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:05.810] POLL: zookeeper-1=leader
+[2026-04-10 11:04:05.811]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:07.589] POLL: zookeeper-1=leader
+[2026-04-10 11:04:07.590]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:09.287] POLL: zookeeper-1=leader
+[2026-04-10 11:04:09.288]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:11.089] POLL: zookeeper-1=leader
+[2026-04-10 11:04:11.090]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:12.713] POLL: zookeeper-1=leader
+[2026-04-10 11:04:12.713]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 11:04:14.378] POLL: zookeeper-1=leader
+[2026-04-10 11:04:14.379]   WARNING: zookeeper-1 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+
+--- PHASE 3: Remove both faults and recover ---
+podchaos.chaos-mesh.org "v2-cascade-follower-r3" deleted from default namespace
+podchaos.chaos-mesh.org "v2-cascade-leader-r3" deleted from default namespace
+[2026-04-10 11:04:15.844] FAULT REMOVED at 2026-04-10 11:04:15.615: deleted chaos_v2_cascade_follower_run3_dynamic.yaml
+[2026-04-10 11:04:15.846] FAULT REMOVED at 2026-04-10 11:04:15.844: deleted chaos_v2_cascade_leader_run3_dynamic.yaml
+[2026-04-10 11:04:15.846] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 11:04:19.175] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 11:04:19.175] RECOVERY CONFIRMED at 2026-04-10 11:04:19.175: leader=zookeeper-1, recovery_seconds=80.8s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:04:19.176
+LEADER AT END: zookeeper-1
+LEADERSHIP CHANGED: yes
+RECOVERY SECONDS: 80.8 (from follower kill)
+NOTES: time_between_kills=15.9s (target=10s); quorum_lost=yes; post-recovery leader: zookeeper-1
+[2026-04-10 11:04:19.179] Run complete - log saved to log_v2_cascading_failure_run3.txt
+
+[2026-04-10 11:04:19.180] === EXPERIMENT C COMPLETE ===
+[2026-04-10 11:04:19.180] Waiting 90s before Experiment D ...
+
+[2026-04-10 11:05:49.181] === EXPERIMENT D: THREE-WAY ISOLATION (1+1+1) - 3 runs ===
+
+[2026-04-10 11:05:49.181] --- Three-Way Isolation Run 1/3 ---
+TEST PURPOSE
+------------
+What: Three simultaneous NetworkChaos objects each isolate one of the 3
+      ZooKeeper nodes from the other two (1+1+1 partition).
+Why:  With ALL nodes isolated, no node has any peers visible. No node can
+      reach the 2/3 majority needed to become or remain leader. The entire
+      ensemble should be in LOOKING/error state simultaneously.
+Academic significance:
+  - Extreme case: total network fragmentation with no possible quorum
+  - Unlike a simple leader partition (B), here EVERY node is isolated
+  - Tests whether ZooKeeper correctly refuses to serve ANY requests when
+    the entire cluster is partitioned (no split-brain possible because no
+    group can form quorum)
+  - With only 1 node visible to itself, majority requires 2/3 - impossible
+  - Expected: all 3 nodes go to not_running/error/looking; writes rejected
+
+EXPERIMENT: threeway_isolation  [NEW - v2 only]
+PARTITION LAYOUT: pod-0 isolated | pod-1 isolated | pod-2 isolated
+                  (1+1+1) - no group has 2/3 majority
+RUN: 1
+START TIME: 2026-04-10 11:05:49.181
+[2026-04-10 11:05:49.184] PREFLIGHT attempt 1/6 at 2026-04-10 11:05:49.184
+[2026-04-10 11:05:49.316]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 11:05:52.560]     zookeeper-0: follower
+[2026-04-10 11:05:52.561]     zookeeper-1: leader
+[2026-04-10 11:05:52.562]     zookeeper-2: follower
+[2026-04-10 11:05:52.563]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 11:05:52.564] PREFLIGHT PASSED [2026-04-10 11:05:52.564]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 11:05:52.570] Generated YAML: chaos_v2_3way_nc0_run1_dynamic.yaml | isolates zookeeper-0 from ['zookeeper-1', 'zookeeper-2']
+[2026-04-10 11:05:52.572] Generated YAML: chaos_v2_3way_nc1_run1_dynamic.yaml | isolates zookeeper-1 from ['zookeeper-0', 'zookeeper-2']
+[2026-04-10 11:05:52.574] Generated YAML: chaos_v2_3way_nc2_run1_dynamic.yaml | isolates zookeeper-2 from ['zookeeper-0', 'zookeeper-1']
+
+--- Applying all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org/v2-3way-nc0-r1 created
+networkchaos.chaos-mesh.org/v2-3way-nc2-r1 created
+networkchaos.chaos-mesh.org/v2-3way-nc1-r1 created
+[2026-04-10 11:05:52.895] ALL 3 FAULTS INJECTED at 2026-04-10 11:05:52.885: 3-way isolation in effect (1+1+1 partition)
+[2026-04-10 11:05:52.896] --- Polling every 1 s for 75 seconds ---
+[2026-04-10 11:05:59.871] POLL: zookeeper-0:not_running | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 11:05:59.872]   NOTE: ['zookeeper-1'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:06:05.371] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:05.372]   ALL NODES LOST QUORUM at 2026-04-10 11:06:05.372 [12.487s after injection]: no leader or follower visible on any node
+[2026-04-10 11:06:09.786] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:14.180] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:18.888] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:23.273] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:27.361] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:31.160] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:35.275] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:39.650] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:43.689] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:47.949] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:52.150] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:06:57.463] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:06:57.465]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:07:01.956] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:07:01.958]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:07:06.280] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:07:06.281]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:07:10.749] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:07:10.750]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+
+--- Deleting all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org "v2-3way-nc1-r1" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc2-r1" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc0-r1" deleted from default namespace
+[2026-04-10 11:07:12.342] ALL FAULTS REMOVED at 2026-04-10 11:07:12.342
+[2026-04-10 11:07:12.343] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 11:07:15.057] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:07:15.057] RECOVERY CONFIRMED at 2026-04-10 11:07:15.057: leader=zookeeper-2, recovery_seconds=82.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:07:15.058
+LEADER AT END: zookeeper-2
+ALL NODES LOST QUORUM: yes
+RECOVERY SECONDS: 82.2 (from injection)
+NOTES: 3-way isolation (1+1+1): no node had majority; all_nodes_lost_quorum=yes; post-recovery leader: zookeeper-2
+[2026-04-10 11:07:15.062] Run complete - log saved to log_v2_threeway_isolation_run1.txt
+[2026-04-10 11:07:15.063] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:08:45.064] --- Three-Way Isolation Run 2/3 ---
+TEST PURPOSE
+------------
+What: Three simultaneous NetworkChaos objects each isolate one of the 3
+      ZooKeeper nodes from the other two (1+1+1 partition).
+Why:  With ALL nodes isolated, no node has any peers visible. No node can
+      reach the 2/3 majority needed to become or remain leader. The entire
+      ensemble should be in LOOKING/error state simultaneously.
+Academic significance:
+  - Extreme case: total network fragmentation with no possible quorum
+  - Unlike a simple leader partition (B), here EVERY node is isolated
+  - Tests whether ZooKeeper correctly refuses to serve ANY requests when
+    the entire cluster is partitioned (no split-brain possible because no
+    group can form quorum)
+  - With only 1 node visible to itself, majority requires 2/3 - impossible
+  - Expected: all 3 nodes go to not_running/error/looking; writes rejected
+
+EXPERIMENT: threeway_isolation  [NEW - v2 only]
+PARTITION LAYOUT: pod-0 isolated | pod-1 isolated | pod-2 isolated
+                  (1+1+1) - no group has 2/3 majority
+RUN: 2
+START TIME: 2026-04-10 11:08:45.065
+[2026-04-10 11:08:45.070] PREFLIGHT attempt 1/6 at 2026-04-10 11:08:45.070
+[2026-04-10 11:08:45.194]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 11:08:48.438]     zookeeper-0: follower
+[2026-04-10 11:08:48.439]     zookeeper-1: follower
+[2026-04-10 11:08:48.440]     zookeeper-2: leader
+[2026-04-10 11:08:48.441]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 11:08:48.442] PREFLIGHT PASSED [2026-04-10 11:08:48.442]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 11:08:48.447] Generated YAML: chaos_v2_3way_nc0_run2_dynamic.yaml | isolates zookeeper-0 from ['zookeeper-1', 'zookeeper-2']
+[2026-04-10 11:08:48.449] Generated YAML: chaos_v2_3way_nc1_run2_dynamic.yaml | isolates zookeeper-1 from ['zookeeper-0', 'zookeeper-2']
+[2026-04-10 11:08:48.451] Generated YAML: chaos_v2_3way_nc2_run2_dynamic.yaml | isolates zookeeper-2 from ['zookeeper-0', 'zookeeper-1']
+
+--- Applying all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org/v2-3way-nc2-r2 created
+networkchaos.chaos-mesh.org/v2-3way-nc0-r2 created
+networkchaos.chaos-mesh.org/v2-3way-nc1-r2 created
+[2026-04-10 11:08:48.722] ALL 3 FAULTS INJECTED at 2026-04-10 11:08:48.701: 3-way isolation in effect (1+1+1 partition)
+[2026-04-10 11:08:48.722] --- Polling every 1 s for 75 seconds ---
+[2026-04-10 11:08:52.151] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:08:52.152]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:08:57.747] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:08:57.749]   ALL NODES LOST QUORUM at 2026-04-10 11:08:57.749 [9.048s after injection]: no leader or follower visible on any node
+[2026-04-10 11:09:02.138] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:06.235] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:10.548] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:14.631] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:18.758] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:23.250] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:27.472] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:31.932] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:36.038] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:39.937] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:44.038] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:47.971] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:53.056] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:09:57.137] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:01.441] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:05.431] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+
+--- Deleting all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org "v2-3way-nc0-r2" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc1-r2" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc2-r2" deleted from default namespace
+[2026-04-10 11:10:07.055] ALL FAULTS REMOVED at 2026-04-10 11:10:07.054
+[2026-04-10 11:10:07.056] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 11:10:10.236] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:14.550] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:18.453] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:23.132] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:27.551] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:32.141] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:36.229] RECOVERY POLL: pods_running=True | zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:10:40.424] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:10:40.426] RECOVERY CONFIRMED at 2026-04-10 11:10:40.426: leader=zookeeper-2, recovery_seconds=111.7s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:10:40.427
+LEADER AT END: zookeeper-2
+ALL NODES LOST QUORUM: yes
+RECOVERY SECONDS: 111.7 (from injection)
+NOTES: 3-way isolation (1+1+1): no node had majority; all_nodes_lost_quorum=yes; post-recovery leader: zookeeper-2
+[2026-04-10 11:10:40.434] Run complete - log saved to log_v2_threeway_isolation_run2.txt
+[2026-04-10 11:10:40.435] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:12:10.436] --- Three-Way Isolation Run 3/3 ---
+TEST PURPOSE
+------------
+What: Three simultaneous NetworkChaos objects each isolate one of the 3
+      ZooKeeper nodes from the other two (1+1+1 partition).
+Why:  With ALL nodes isolated, no node has any peers visible. No node can
+      reach the 2/3 majority needed to become or remain leader. The entire
+      ensemble should be in LOOKING/error state simultaneously.
+Academic significance:
+  - Extreme case: total network fragmentation with no possible quorum
+  - Unlike a simple leader partition (B), here EVERY node is isolated
+  - Tests whether ZooKeeper correctly refuses to serve ANY requests when
+    the entire cluster is partitioned (no split-brain possible because no
+    group can form quorum)
+  - With only 1 node visible to itself, majority requires 2/3 - impossible
+  - Expected: all 3 nodes go to not_running/error/looking; writes rejected
+
+EXPERIMENT: threeway_isolation  [NEW - v2 only]
+PARTITION LAYOUT: pod-0 isolated | pod-1 isolated | pod-2 isolated
+                  (1+1+1) - no group has 2/3 majority
+RUN: 3
+START TIME: 2026-04-10 11:12:10.438
+[2026-04-10 11:12:10.444] PREFLIGHT attempt 1/6 at 2026-04-10 11:12:10.444
+[2026-04-10 11:12:10.586]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 11:12:13.938]     zookeeper-0: follower
+[2026-04-10 11:12:13.940]     zookeeper-1: follower
+[2026-04-10 11:12:13.941]     zookeeper-2: leader
+[2026-04-10 11:12:13.942]   Check 2 PASS: leader=zookeeper-2, followers=['zookeeper-0', 'zookeeper-1']
+[2026-04-10 11:12:13.943] PREFLIGHT PASSED [2026-04-10 11:12:13.943]
+LEADER AT START: zookeeper-2
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-1
+
+[2026-04-10 11:12:13.948] Generated YAML: chaos_v2_3way_nc0_run3_dynamic.yaml | isolates zookeeper-0 from ['zookeeper-1', 'zookeeper-2']
+[2026-04-10 11:12:13.951] Generated YAML: chaos_v2_3way_nc1_run3_dynamic.yaml | isolates zookeeper-1 from ['zookeeper-0', 'zookeeper-2']
+[2026-04-10 11:12:13.953] Generated YAML: chaos_v2_3way_nc2_run3_dynamic.yaml | isolates zookeeper-2 from ['zookeeper-0', 'zookeeper-1']
+
+--- Applying all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org/v2-3way-nc0-r3 created
+networkchaos.chaos-mesh.org/v2-3way-nc1-r3 created
+networkchaos.chaos-mesh.org/v2-3way-nc2-r3 created
+[2026-04-10 11:12:14.362] ALL 3 FAULTS INJECTED at 2026-04-10 11:12:14.208: 3-way isolation in effect (1+1+1 partition)
+[2026-04-10 11:12:14.363] --- Polling every 1 s for 75 seconds ---
+[2026-04-10 11:12:20.021] POLL: zookeeper-0:not_running | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:12:20.023]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:12:25.128] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:25.129]   ALL NODES LOST QUORUM at 2026-04-10 11:12:25.129 [10.921s after injection]: no leader or follower visible on any node
+[2026-04-10 11:12:29.371] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:33.847] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:37.820] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:42.116] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:46.247] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:49.916] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:54.362] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:12:58.841] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:13:03.208] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:13:07.629] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:13:11.921] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:13:17.114] POLL: zookeeper-0:not_running | zookeeper-1:not_running | zookeeper-2:not_running
+[2026-04-10 11:13:20.815] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:13:20.817]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:13:25.308] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:13:25.309]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+[2026-04-10 11:13:29.540] POLL: zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:13:29.542]   NOTE: ['zookeeper-2'] still reports 'leader' - may not yet detect partition
+
+--- Deleting all 3 NetworkChaos objects simultaneously ---
+networkchaos.chaos-mesh.org "v2-3way-nc0-r3" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc2-r3" deleted from default namespace
+networkchaos.chaos-mesh.org "v2-3way-nc1-r3" deleted from default namespace
+[2026-04-10 11:13:31.203] ALL FAULTS REMOVED at 2026-04-10 11:13:31.203
+[2026-04-10 11:13:31.204] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 11:13:34.704] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 11:13:34.706] RECOVERY CONFIRMED at 2026-04-10 11:13:34.706: leader=zookeeper-2, recovery_seconds=80.5s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:13:34.707
+LEADER AT END: zookeeper-2
+ALL NODES LOST QUORUM: yes
+RECOVERY SECONDS: 80.5 (from injection)
+NOTES: 3-way isolation (1+1+1): no node had majority; all_nodes_lost_quorum=yes; post-recovery leader: zookeeper-2
+[2026-04-10 11:13:34.713] Run complete - log saved to log_v2_threeway_isolation_run3.txt
+
+[2026-04-10 11:13:34.714] === EXPERIMENT D COMPLETE ===
+[2026-04-10 11:13:34.714] Waiting 60s then deploying 5-node ZooKeeper ensemble ...
+
+[2026-04-10 11:14:34.715] === DEPLOYING 5-NODE ZOOKEEPER ENSEMBLE ===
+[2026-04-10 11:14:34.715] Deploying 5-node ZooKeeper StatefulSet (zookeeper5.yaml) ...
+[2026-04-10 11:14:35.049] kubectl apply output: service/zookeeper5-headless unchanged
+service/zookeeper5 unchanged
+statefulset.apps/zookeeper5 configured
+[2026-04-10 11:14:35.049] Waiting for all 5 zookeeper5 pods to be 1/1 Running (up to 5 min) ...
+[2026-04-10 11:14:35.158]   5/5 pods Running
+[2026-04-10 11:14:35.158] All 5 zookeeper5 pods are Running.
+[2026-04-10 11:14:35.158] Waiting 30s for leader election in new 5-node ensemble ...
+[2026-04-10 11:15:05.159] 5-node ensemble ready. Waiting 30s before Experiment E ...
+
+[2026-04-10 11:15:35.160] === EXPERIMENT E: 5-NODE 3+2 MAJORITY PARTITION - 3 runs ===
+
+[2026-04-10 11:15:35.160] --- 5-Node 3+2 Partition Run 1/3 ---
+TEST PURPOSE
+------------
+What: A 5-node ZooKeeper ensemble is partitioned into two groups:
+      Group A: {zk5-0, zk5-1, zk5-2} (3 nodes - has 3/5 = 60% majority)
+      Group B: {zk5-3, zk5-4}         (2 nodes - has 2/5 = 40% minority)
+Why:  With 5 nodes, it IS possible to create two groups where one group
+      has strict majority and the other does not. This is impossible with
+      3 nodes (you cannot split 3 into two groups both having >50%).
+Academic significance:
+  - Tests asymmetric partition: one side maintains service, other loses it
+  - Group A (3 nodes) should elect/retain a leader and continue operating
+  - Group B (2 nodes) cannot reach quorum and must refuse writes/reads
+  - This is the "correct" split-brain resolution: ZooKeeper correctly
+    identifies which side has majority and only that side serves clients
+  - Real-world relevance: datacenter partition where main DC has majority
+
+EXPERIMENT: 5node_majority_partition  [NEW - v2 only, 5-node ensemble]
+PARTITION: {zk5-0, zk5-1, zk5-2} vs {zk5-3, zk5-4}
+           Group A (3/5 = majority) | Group B (2/5 = minority)
+RUN: 1
+START TIME: 2026-04-10 11:15:35.161
+[2026-04-10 11:15:35.166] PREFLIGHT-5NODE attempt 1/6 at 2026-04-10 11:15:35.166
+[2026-04-10 11:15:35.298]   Check 1 PASS: all 5 zookeeper5 pods are 1/1 Running
+[2026-04-10 11:15:41.216]     zookeeper5-0: follower
+[2026-04-10 11:15:41.217]     zookeeper5-1: follower
+[2026-04-10 11:15:41.218]     zookeeper5-2: follower
+[2026-04-10 11:15:41.219]     zookeeper5-3: follower
+[2026-04-10 11:15:41.220]     zookeeper5-4: leader
+[2026-04-10 11:15:41.221]   Check 2 PASS: leader=zookeeper5-4, followers=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2', 'zookeeper5-3']
+[2026-04-10 11:15:41.222] PREFLIGHT-5NODE PASSED [2026-04-10 11:15:41.222]
+LEADER AT START: zookeeper5-4
+FOLLOWERS: ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2', 'zookeeper5-3']
+
+[2026-04-10 11:15:41.225] Leader zookeeper5-4 is in Group B. Group A has 3/5 majority so will retain/elect leader.
+[2026-04-10 11:15:41.227] Generated YAML: chaos_v2_5node_majority_run1_dynamic.yaml
+[2026-04-10 11:15:41.228]   Partitioning Group A=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2'] from Group B=['zookeeper5-3', 'zookeeper5-4']
+networkchaos.chaos-mesh.org/v2-5node-majority-r1 created
+[2026-04-10 11:15:41.479] FAULT INJECTED at 2026-04-10 11:15:41.479: kubectl apply -f chaos_v2_5node_majority_run1_dynamic.yaml
+[2026-04-10 11:15:41.480] --- Polling every 1s for 75 seconds ---
+[2026-04-10 11:15:47.815] POLL: zookeeper5-0:not_running | zookeeper5-1:follower | zookeeper5-2:follower | zookeeper5-3:follower | zookeeper5-4:leader
+[2026-04-10 11:15:47.816]   NOTE: Group B pod ['zookeeper5-4'] claims 'leader' but has only 2/5 - ZAB quorum not satisfied
+[2026-04-10 11:15:54.404] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:15:54.405]   GROUP A LEADER ACTIVE: zookeeper5-2 [12.926s after injection] - 3-node majority intact
+[2026-04-10 11:15:54.406]   GROUP B LOST QUORUM at 2026-04-10 11:15:54.406 [12.927s]: both minority nodes are not_running/error
+[2026-04-10 11:16:00.821] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:16:06.708] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:20:21.734] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 11:20:23.005] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-5node-majority-r1" deleted from default namespace
+[2026-04-10 11:26:52.506] FAULT REMOVED (manual) at 2026-04-10 11:26:52.506
+[2026-04-10 11:26:52.509] --- Polling for full recovery (all 5 pods Running, exactly 1 leader) ---
+[2026-04-10 11:26:55.988] RECOVERY POLL: pods_running=True(5/5) | zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:follower
+[2026-04-10 11:42:02.729] RECOVERY TIMEOUT after 910.2s - 5-node cluster did not fully recover
+
+EXPERIMENT END TIME: 2026-04-10 11:42:02.729
+LEADER AT END: unknown
+GROUP A (3/5 MAJORITY) PRESERVED QUORUM: True
+GROUP B (2/5 MINORITY) LOST QUORUM: True
+RECOVERY SECONDS: 910.2
+NOTES: Group A (3/5 majority) preserved_quorum=True; Group B (2/5 minority) lost_quorum=True; group_a_leader_during_partition=zookeeper5-2; RECOVERY TIMEOUT
+[2026-04-10 11:42:02.794] Run complete - log saved to log_v2_5node_majority_partition_run1.txt
+[2026-04-10 11:42:02.795] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:43:32.796] --- 5-Node 3+2 Partition Run 2/3 ---
+TEST PURPOSE
+------------
+What: A 5-node ZooKeeper ensemble is partitioned into two groups:
+      Group A: {zk5-0, zk5-1, zk5-2} (3 nodes - has 3/5 = 60% majority)
+      Group B: {zk5-3, zk5-4}         (2 nodes - has 2/5 = 40% minority)
+Why:  With 5 nodes, it IS possible to create two groups where one group
+      has strict majority and the other does not. This is impossible with
+      3 nodes (you cannot split 3 into two groups both having >50%).
+Academic significance:
+  - Tests asymmetric partition: one side maintains service, other loses it
+  - Group A (3 nodes) should elect/retain a leader and continue operating
+  - Group B (2 nodes) cannot reach quorum and must refuse writes/reads
+  - This is the "correct" split-brain resolution: ZooKeeper correctly
+    identifies which side has majority and only that side serves clients
+  - Real-world relevance: datacenter partition where main DC has majority
+
+EXPERIMENT: 5node_majority_partition  [NEW - v2 only, 5-node ensemble]
+PARTITION: {zk5-0, zk5-1, zk5-2} vs {zk5-3, zk5-4}
+           Group A (3/5 = majority) | Group B (2/5 = minority)
+RUN: 2
+START TIME: 2026-04-10 11:43:32.797
+[2026-04-10 11:43:32.798] PREFLIGHT-5NODE attempt 1/6 at 2026-04-10 11:43:32.798
+[2026-04-10 11:43:32.906]   Check 1 PASS: all 5 zookeeper5 pods are 1/1 Running
+[2026-04-10 11:43:37.752]     zookeeper5-0: follower
+[2026-04-10 11:43:37.752]     zookeeper5-1: follower
+[2026-04-10 11:43:37.753]     zookeeper5-2: leader
+[2026-04-10 11:43:37.753]     zookeeper5-3: follower
+[2026-04-10 11:43:37.753]     zookeeper5-4: follower
+[2026-04-10 11:43:37.754]   Check 2 PASS: leader=zookeeper5-2, followers=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+[2026-04-10 11:43:37.754] PREFLIGHT-5NODE PASSED [2026-04-10 11:43:37.754]
+LEADER AT START: zookeeper5-2
+FOLLOWERS: ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+
+[2026-04-10 11:43:37.755] Leader zookeeper5-2 is in Group A. Group A has 3/5 majority so will retain/elect leader.
+[2026-04-10 11:43:37.755] Generated YAML: chaos_v2_5node_majority_run2_dynamic.yaml
+[2026-04-10 11:43:37.755]   Partitioning Group A=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2'] from Group B=['zookeeper5-3', 'zookeeper5-4']
+networkchaos.chaos-mesh.org/v2-5node-majority-r2 created
+[2026-04-10 11:43:37.953] FAULT INJECTED at 2026-04-10 11:43:37.952: kubectl apply -f chaos_v2_5node_majority_run2_dynamic.yaml
+[2026-04-10 11:43:37.954] --- Polling every 1s for 75 seconds ---
+[2026-04-10 11:43:45.994] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 11:43:45.995]   GROUP B LOST QUORUM at 2026-04-10 11:43:45.995 [8.042s]: both minority nodes are not_running/error
+[2026-04-10 11:43:52.178] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:43:52.178]   GROUP A LEADER ACTIVE: zookeeper5-2 [14.226s after injection] - 3-node majority intact
+[2026-04-10 11:43:56.954] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:02.554] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:07.748] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:14.180] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:22.273] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:29.878] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:37.564] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:44:46.476] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:44:54.152] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:44:55.310] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-5node-majority-r2" deleted from default namespace
+[2026-04-10 11:44:55.542] FAULT REMOVED (manual) at 2026-04-10 11:44:55.542
+[2026-04-10 11:44:55.543] --- Polling for full recovery (all 5 pods Running, exactly 1 leader) ---
+[2026-04-10 11:45:03.271] RECOVERY POLL: pods_running=True(5/5) | zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:45:03.272] RECOVERY CONFIRMED at 2026-04-10 11:45:03.272: leader=zookeeper5-2, recovery_seconds=85.3s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:45:03.272
+LEADER AT END: zookeeper5-2
+GROUP A (3/5 MAJORITY) PRESERVED QUORUM: True
+GROUP B (2/5 MINORITY) LOST QUORUM: True
+RECOVERY SECONDS: 85.3
+NOTES: Group A (3/5 majority) preserved_quorum=True; Group B (2/5 minority) lost_quorum=True; group_a_leader_during_partition=zookeeper5-2; post-recovery leader: zookeeper5-2
+[2026-04-10 11:45:03.274] Run complete - log saved to log_v2_5node_majority_partition_run2.txt
+[2026-04-10 11:45:03.275] Waiting 90s for stabilisation ...
+
+[2026-04-10 11:46:33.275] --- 5-Node 3+2 Partition Run 3/3 ---
+TEST PURPOSE
+------------
+What: A 5-node ZooKeeper ensemble is partitioned into two groups:
+      Group A: {zk5-0, zk5-1, zk5-2} (3 nodes - has 3/5 = 60% majority)
+      Group B: {zk5-3, zk5-4}         (2 nodes - has 2/5 = 40% minority)
+Why:  With 5 nodes, it IS possible to create two groups where one group
+      has strict majority and the other does not. This is impossible with
+      3 nodes (you cannot split 3 into two groups both having >50%).
+Academic significance:
+  - Tests asymmetric partition: one side maintains service, other loses it
+  - Group A (3 nodes) should elect/retain a leader and continue operating
+  - Group B (2 nodes) cannot reach quorum and must refuse writes/reads
+  - This is the "correct" split-brain resolution: ZooKeeper correctly
+    identifies which side has majority and only that side serves clients
+  - Real-world relevance: datacenter partition where main DC has majority
+
+EXPERIMENT: 5node_majority_partition  [NEW - v2 only, 5-node ensemble]
+PARTITION: {zk5-0, zk5-1, zk5-2} vs {zk5-3, zk5-4}
+           Group A (3/5 = majority) | Group B (2/5 = minority)
+RUN: 3
+START TIME: 2026-04-10 11:46:33.276
+[2026-04-10 11:46:33.279] PREFLIGHT-5NODE attempt 1/6 at 2026-04-10 11:46:33.279
+[2026-04-10 11:46:33.385]   Check 1 PASS: all 5 zookeeper5 pods are 1/1 Running
+[2026-04-10 11:46:38.653]     zookeeper5-0: follower
+[2026-04-10 11:46:38.654]     zookeeper5-1: follower
+[2026-04-10 11:46:38.654]     zookeeper5-2: leader
+[2026-04-10 11:46:38.655]     zookeeper5-3: follower
+[2026-04-10 11:46:38.656]     zookeeper5-4: follower
+[2026-04-10 11:46:38.657]   Check 2 PASS: leader=zookeeper5-2, followers=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+[2026-04-10 11:46:38.657] PREFLIGHT-5NODE PASSED [2026-04-10 11:46:38.657]
+LEADER AT START: zookeeper5-2
+FOLLOWERS: ['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-3', 'zookeeper5-4']
+
+[2026-04-10 11:46:38.660] Leader zookeeper5-2 is in Group A. Group A has 3/5 majority so will retain/elect leader.
+[2026-04-10 11:46:38.661] Generated YAML: chaos_v2_5node_majority_run3_dynamic.yaml
+[2026-04-10 11:46:38.662]   Partitioning Group A=['zookeeper5-0', 'zookeeper5-1', 'zookeeper5-2'] from Group B=['zookeeper5-3', 'zookeeper5-4']
+networkchaos.chaos-mesh.org/v2-5node-majority-r3 created
+[2026-04-10 11:46:38.898] FAULT INJECTED at 2026-04-10 11:46:38.898: kubectl apply -f chaos_v2_5node_majority_run3_dynamic.yaml
+[2026-04-10 11:46:38.898] --- Polling every 1s for 75 seconds ---
+[2026-04-10 11:46:46.972] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:timeout | zookeeper5-4:timeout
+[2026-04-10 11:46:46.974]   GROUP B LOST QUORUM at 2026-04-10 11:46:46.974 [8.076s]: both minority nodes are not_running/error
+[2026-04-10 11:46:55.958] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:46:55.959]   GROUP A LEADER ACTIVE: zookeeper5-2 [17.061s after injection] - 3-node majority intact
+[2026-04-10 11:47:01.040] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:05.631] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:11.447] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:16.456] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:22.538] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:30.172] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:39.203] POLL: zookeeper5-0:timeout | zookeeper5-1:timeout | zookeeper5-2:timeout | zookeeper5-3:not_running | zookeeper5-4:timeout
+[2026-04-10 11:47:43.618] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:not_running | zookeeper5-4:not_running
+[2026-04-10 11:47:48.036] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:47:54.952] POLL: zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:47:56.091] Chaos object still present after 75s - deleting manually ...
+networkchaos.chaos-mesh.org "v2-5node-majority-r3" deleted from default namespace
+[2026-04-10 11:47:56.338] FAULT REMOVED (manual) at 2026-04-10 11:47:56.338
+[2026-04-10 11:47:56.339] --- Polling for full recovery (all 5 pods Running, exactly 1 leader) ---
+[2026-04-10 11:48:02.830] RECOVERY POLL: pods_running=True(5/5) | zookeeper5-0:follower | zookeeper5-1:follower | zookeeper5-2:leader | zookeeper5-3:follower | zookeeper5-4:follower
+[2026-04-10 11:48:02.831] RECOVERY CONFIRMED at 2026-04-10 11:48:02.831: leader=zookeeper5-2, recovery_seconds=83.9s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 11:48:02.832
+LEADER AT END: zookeeper5-2
+GROUP A (3/5 MAJORITY) PRESERVED QUORUM: True
+GROUP B (2/5 MINORITY) LOST QUORUM: True
+RECOVERY SECONDS: 83.9
+NOTES: Group A (3/5 majority) preserved_quorum=True; Group B (2/5 minority) lost_quorum=True; group_a_leader_during_partition=zookeeper5-2; post-recovery leader: zookeeper5-2
+[2026-04-10 11:48:02.836] Run complete - log saved to log_v2_5node_majority_partition_run3.txt

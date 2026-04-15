@@ -1,0 +1,125 @@
+TEST PURPOSE
+------------
+What: A follower is killed first; 10 seconds later the leader is also killed.
+      Only 1 of 3 nodes remains alive, which cannot reach quorum (1/3 < 50%).
+Why:  This tests ZooKeeper's behavior when quorum is permanently lost.
+      The single surviving node must recognize it cannot form a quorum and
+      refuse to accept writes or serve as leader/follower.
+Academic significance:
+  - Validates quorum loss detection (surviving pod should go to LOOKING/error)
+  - Tests Kubernetes pod restart speed vs ZK session timeout interaction
+  - Cascading failures are common in real outage scenarios (first one node,
+    then operators/runbooks kill more, losing quorum)
+  - Note: PodChaos triggers instant K8s restart; pods may rejoin before ZK
+    detects quorum loss if restart is faster than ZK session timeout (~30s)
+
+EXPERIMENT: cascading_failure  [v2 - 1-second parallel polling]
+RUN: 2
+START TIME: 2026-04-10 15:28:42.709
+[2026-04-10 15:28:42.712] PREFLIGHT attempt 1/6 at 2026-04-10 15:28:42.712
+[2026-04-10 15:28:42.875]   Check 1 PASS: all 3 pods are 1/1 Running
+[2026-04-10 15:28:46.595]     zookeeper-0: follower
+[2026-04-10 15:28:46.597]     zookeeper-1: leader
+[2026-04-10 15:28:46.597]     zookeeper-2: follower
+[2026-04-10 15:28:46.598]   Check 2 PASS: leader=zookeeper-1, followers=['zookeeper-0', 'zookeeper-2']
+[2026-04-10 15:28:46.599] PREFLIGHT PASSED [2026-04-10 15:28:46.599]
+LEADER AT START: zookeeper-1
+FOLLOWER 1: zookeeper-0
+FOLLOWER 2: zookeeper-2
+
+[2026-04-10 15:28:46.602] Plan: kill zookeeper-0 (follower), wait 10s, then kill zookeeper-1 (leader). Surviving pod: zookeeper-2
+[2026-04-10 15:28:46.605] Generated YAML: chaos_yamls\chaos_v2_cascade_follower_run2_dynamic.yaml (targeting follower zookeeper-0)
+[2026-04-10 15:28:46.606] Generated YAML: chaos_yamls\chaos_v2_cascade_leader_run2_dynamic.yaml   (targeting leader zookeeper-1)
+
+--- PHASE 1: Kill follower ---
+[2026-04-10 15:28:46.878] FAULT INJECTED (1/2) at 2026-04-10 15:28:46.878: killed zookeeper-0
+[2026-04-10 15:28:46.879] Waiting 10 seconds before killing leader ...
+[2026-04-10 15:29:00.476] POLL 10s mark after follower kill: zookeeper-0:unknown | zookeeper-1:leader | zookeeper-2:follower
+[2026-04-10 15:29:00.477]   Leader at 10s: zookeeper-1
+
+--- PHASE 2: Kill leader (quorum now impossible with 1/3 alive) ---
+[2026-04-10 15:29:00.709] FAULT INJECTED (2/2) at 2026-04-10 15:29:00.709: killed zookeeper-1
+[2026-04-10 15:29:00.710] Time between follower kill and leader kill: 13.8s
+[2026-04-10 15:29:00.710] 2/3 nodes are now down (zookeeper-0, zookeeper-1). Surviving node: zookeeper-2. NO QUORUM possible.
+[2026-04-10 15:29:00.712] --- Polling surviving pod (zookeeper-2) every 1s for 60s ---
+[2026-04-10 15:29:01.981] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:01.982]   QUORUM LOST CONFIRMED: zookeeper-2 cannot report leader/follower (status=not_running)
+[2026-04-10 15:29:04.191] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:06.514] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:08.004] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:09.581] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:11.164] POLL: zookeeper-2=not_running
+[2026-04-10 15:29:13.567] POLL: zookeeper-2=leader
+[2026-04-10 15:29:13.568]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:15.098] POLL: zookeeper-2=leader
+[2026-04-10 15:29:15.099]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:16.600] POLL: zookeeper-2=leader
+[2026-04-10 15:29:16.601]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:18.408] POLL: zookeeper-2=leader
+[2026-04-10 15:29:18.408]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:20.106] POLL: zookeeper-2=leader
+[2026-04-10 15:29:20.106]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:21.876] POLL: zookeeper-2=leader
+[2026-04-10 15:29:21.877]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:23.801] POLL: zookeeper-2=leader
+[2026-04-10 15:29:23.801]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:25.306] POLL: zookeeper-2=leader
+[2026-04-10 15:29:25.306]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:26.803] POLL: zookeeper-2=leader
+[2026-04-10 15:29:26.804]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:28.359] POLL: zookeeper-2=leader
+[2026-04-10 15:29:28.360]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:29.956] POLL: zookeeper-2=leader
+[2026-04-10 15:29:29.958]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:31.463] POLL: zookeeper-2=leader
+[2026-04-10 15:29:31.463]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:32.985] POLL: zookeeper-2=leader
+[2026-04-10 15:29:32.986]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:34.513] POLL: zookeeper-2=leader
+[2026-04-10 15:29:34.514]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:36.071] POLL: zookeeper-2=leader
+[2026-04-10 15:29:36.072]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:37.601] POLL: zookeeper-2=leader
+[2026-04-10 15:29:37.602]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:39.096] POLL: zookeeper-2=leader
+[2026-04-10 15:29:39.097]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:40.882] POLL: zookeeper-2=leader
+[2026-04-10 15:29:40.883]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:42.599] POLL: zookeeper-2=leader
+[2026-04-10 15:29:42.600]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:44.404] POLL: zookeeper-2=leader
+[2026-04-10 15:29:44.405]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:46.086] POLL: zookeeper-2=leader
+[2026-04-10 15:29:46.087]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:47.798] POLL: zookeeper-2=leader
+[2026-04-10 15:29:47.799]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:49.465] POLL: zookeeper-2=leader
+[2026-04-10 15:29:49.465]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:51.010] POLL: zookeeper-2=leader
+[2026-04-10 15:29:51.011]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:52.670] POLL: zookeeper-2=leader
+[2026-04-10 15:29:52.671]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:54.378] POLL: zookeeper-2=leader
+[2026-04-10 15:29:54.379]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:55.900] POLL: zookeeper-2=leader
+[2026-04-10 15:29:55.901]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:57.480] POLL: zookeeper-2=leader
+[2026-04-10 15:29:57.480]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:29:59.083] POLL: zookeeper-2=leader
+[2026-04-10 15:29:59.083]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+[2026-04-10 15:30:00.668] POLL: zookeeper-2=leader
+[2026-04-10 15:30:00.669]   WARNING: zookeeper-2 reports 'leader' unexpectedly (should not have quorum with only 1/3 nodes alive)
+
+--- PHASE 3: Remove both faults and recover ---
+[2026-04-10 15:30:02.148] FAULT REMOVED at 2026-04-10 15:30:01.904: deleted chaos_yamls\chaos_v2_cascade_follower_run2_dynamic.yaml
+[2026-04-10 15:30:02.149] FAULT REMOVED at 2026-04-10 15:30:02.148: deleted chaos_yamls\chaos_v2_cascade_leader_run2_dynamic.yaml
+[2026-04-10 15:30:02.150] --- Polling for full recovery (all 3 pods Running, exactly 1 leader) ---
+[2026-04-10 15:30:05.060] RECOVERY POLL: pods_running=True | zookeeper-0:follower | zookeeper-1:follower | zookeeper-2:leader
+[2026-04-10 15:30:05.061] RECOVERY CONFIRMED at 2026-04-10 15:30:05.061: leader=zookeeper-2, recovery_seconds=78.2s (from injection)
+
+EXPERIMENT END TIME: 2026-04-10 15:30:05.061
+LEADER AT END: zookeeper-2
+LEADERSHIP CHANGED: yes
+RECOVERY SECONDS: 78.2 (from follower kill)
+NOTES: time_between_kills=13.8s (target=10s); quorum_lost=yes; post-recovery leader: zookeeper-2
+[2026-04-10 15:30:05.065] Run complete - log saved to logs\log_v2_cascading_failure_run2.txt

@@ -1,0 +1,11 @@
+Unable to listen on port 2181: Listeners failed to create with the following errors: [unable to create listener: Error listen tcp4 127.0.0.1:2181: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted. unable to create listener: Error listen tcp6 [::1]:2181: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.]
+error: unable to listen on any of the requested ports: [{2181 2181}]
+Forwarding from 127.0.0.1:2181 -> 2181
+Forwarding from [::1]:2181 -> 2181
+Handling connection for 2181
+Handling connection for 2181
+Handling connection for 2181
+Handling connection for 2181
+Handling connection for 2181
+E0410 15:10:58.200626   13204 portforward.go:424] "Unhandled Error" err="an error occurred forwarding 2181 -> 2181: error forwarding port 2181 to pod 89070f794577b0b3fba49a0735265b3c477c02edc62e975bc909b10bc6a75155, uid : container not running (89070f794577b0b3fba49a0735265b3c477c02edc62e975bc909b10bc6a75155)"
+error: lost connection to pod

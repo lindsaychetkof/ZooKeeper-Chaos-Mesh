@@ -1,0 +1,30 @@
+[18:13:51.460] OK  - wrote 0, read back 0
+[18:13:51.974] OK  - wrote 1, read back 1
+[18:13:52.498] OK  - wrote 2, read back 2
+[18:13:53.022] OK  - wrote 3, read back 3
+[18:13:53.548] OK  - wrote 4, read back 4
+[18:13:54.074] OK  - wrote 5, read back 5
+[18:13:54.596] OK  - wrote 6, read back 6
+[18:13:55.116] OK  - wrote 7, read back 7
+[18:13:55.639] OK  - wrote 8, read back 8
+[18:13:56.157] OK  - wrote 9, read back 9
+[18:13:56.684] OK  - wrote 10, read back 10
+Connection dropped: socket connection broken
+Transition to CONNECTING
+[18:13:57.203] ERROR -
+Connection dropped: socket connection broken
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Connection dropped: socket connection error: No connection could be made because the target machine actively refused it
+Session has expired
+[18:13:58.609] ERROR -
+[18:14:50.503] OK  - wrote 11, read back 11
+[18:14:51.039] OK  - wrote 12, read back 12
+[18:14:51.644] OK  - wrote 13, read back 13
+[18:14:52.166] OK  - wrote 14, read back 14
+[18:14:52.736] OK  - wrote 15, read back 15
+[18:14:53.263] OK  - wrote 16, read back 16
+[18:14:53.785] OK  - wrote 17, read back 17

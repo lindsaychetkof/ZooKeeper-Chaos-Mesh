@@ -1,0 +1,13 @@
+# ================================================================
+# ZooKeeper Workload Log
+# Started     : 2026-04-10 15:06:33
+# ZK host     : 127.0.0.1:2181
+# Log file    : logs\workload\workload_20260410_150633.txt
+# Interval    : 0.5s between operations
+#
+# Correlation : match timestamps below with FAULT INJECTED /
+#   FAULT REMOVED events in logs/log_v2_all_experiments_master.txt
+#   Format: [YYYY-MM-DD HH:MM:SS.mmm] OK/ERROR - details
+# ================================================================
+
+[2026-04-10 15:06:33.807] CONNECTING to ZooKeeper at 127.0.0.1:2181 ...
