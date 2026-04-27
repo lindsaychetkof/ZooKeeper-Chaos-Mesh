@@ -21,5 +21,5 @@ Python, Kubernetes, Minikube, Docker, Chaos Mesh, Apache ZooKeeper
 - `SetupGuide.md`: reproduction instructions
 
 ## Main Artifacts
-- Final report: `CS 390 FINAL REPORT CHAOS KEEPERS.pdf`
+- Final report: `final-report-chaos-keepers.pdf`
 - Presentation: `CS390-Final-Presentation.pdf`
